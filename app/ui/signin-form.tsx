@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 export default function SignInForm() {
   return (
     <form className="rounded-lg text-black py-10 px-12 bg-white/40">
@@ -6,7 +8,7 @@ export default function SignInForm() {
         <label htmlFor="email">Email Address:</label>
         <input className="rounded-md" type="email" id="email" />
       </div>
-      <button className="btn">Submit</button>
+      <Button>Submit</Button>
     </form>
   );
 }
