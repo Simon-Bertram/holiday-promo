@@ -3,7 +3,7 @@ import NavLinks from "./nav-links";
 
 export default function NavBar() {
   return (
-    <div>
+    <div className="fixed top-0 left-0 right-0 bg-transparent z-10 p-4">
       <nav className="flex items-center justify-between mx-auto h-16 max-w-4xl px-4">
         <Link href="/">
           <div>
