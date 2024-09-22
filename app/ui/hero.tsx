@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function InputWithButton() {
+function InputWithButton() {
   return (
     <div className="flex items-center space-x-2">
       <Input type="email" placeholder="Email" />
