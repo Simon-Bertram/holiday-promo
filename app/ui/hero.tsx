@@ -1,20 +1,5 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-function InputWithButton() {
-  return (
-    <div className="flex items-center space-x-2">
-      <Input type="email" placeholder="Email" />
-      <Button
-        className="bg-white text-gray-800 hover:bg-blue-700 hover:text-white"
-        type="submit"
-      >
-        Subscribe
-      </Button>
-    </div>
-  );
-}
+import Subscribe from "../api/subscribe/subscribe-form";
 
 export default function Hero() {
   return (
@@ -49,9 +34,7 @@ export default function Hero() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white text-center mb-12">
           Great holidays for you
         </h1>
-        <div className="w-full max-w-md flex justify-center">
-          <InputWithButton />
-        </div>
+        <Subscribe />
       </div>
     </div>
   );

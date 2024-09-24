@@ -20,7 +20,7 @@ export default function NavLinks() {
           key={link.label}
           href={link.href}
           className={clsx(
-            "text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200",
+            "text-lg font-semibold text-white hover:text-blue-600 transition-colors duration-200",
             "border-b-2 border-transparent pb-1 cursor-pointer",
             {
               "border-blue-600 text-blue-600": pathname === link.href,
