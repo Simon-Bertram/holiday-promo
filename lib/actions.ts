@@ -11,7 +11,10 @@ const FormSchema = z.object({
 });
 
 export async function subscribe(formData: FormData) {
-  const rawFormData = { email: formData.get("email"), name: "Manuel Manual" };
+  const rawFormData = {
+    email: formData.get("emailAddress"),
+    name: formData.get("name"),
+  };
   console.log("Form data: ", rawFormData);
 
   try {
@@ -22,7 +25,7 @@ export async function subscribe(formData: FormData) {
     const newSubscriber = await prisma.subscriber.create({
       data: {
         email: validatedData.email,
-        name: rawFormData.name,
+        name: rawFormData.name as string,
       },
     });
 

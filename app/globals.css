@@ -3,8 +3,65 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 60 10% 98%; /* #FAFAFA */
+  --foreground: 0 0% 20%; /* #333333 */
+
+  --card: 60 10% 98%; /* #FAFAFA */
+  --card-foreground: 0 0% 20%; /* #333333 */
+
+  --popover: 60 10% 98%; /* #FAFAFA */
+  --popover-foreground: 0 0% 20%; /* #333333 */
+
+  --primary: 187 100% 34%; /* #00A0B0 */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+
+  --secondary: 45 94% 59%; /* #F9BA32 */
+  --secondary-foreground: 0 0% 0%; /* #000000 */
+
+  --muted: 174 45% 62%; /* #6ECCC2 */
+  --muted-foreground: 0 0% 0%; /* #000000 */
+
+  --accent: 22 100% 63%; /* #FF8C42 */
+  --accent-foreground: 0 0% 100%; /* #FFFFFF */
+
+  --destructive: 4 81% 55%; /* #E53935 */
+  --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+
+  --border: 187 100% 34%; /* #00A0B0 */
+  --input: 187 100% 34%; /* #00A0B0 */
+  --ring: 187 100% 34%; /* #00A0B0 */
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 187 100% 34%; /* #00A0B0 */
+  --foreground: 60 10% 98%; /* #FAFAFA */
+
+  --card: 187 100% 34%; /* #00A0B0 */
+  --card-foreground: 60 10% 98%; /* #FAFAFA */
+
+  --popover: 187 100% 34%; /* #00A0B0 */
+  --popover-foreground: 60 10% 98%; /* #FAFAFA */
+
+  --primary: 45 94% 59%; /* #F9BA32 */
+  --primary-foreground: 0 0% 0%; /* #000000 */
+
+  --secondary: 174 45% 62%; /* #6ECCC2 */
+  --secondary-foreground: 0 0% 0%; /* #000000 */
+
+  --muted: 22 100% 63%; /* #FF8C42 */
+  --muted-foreground: 0 0% 100%; /* #FFFFFF */
+
+  --accent: 60 10% 98%; /* #FAFAFA */
+  --accent-foreground: 0 0% 20%; /* #333333 */
+
+  --destructive: 4 81% 55%; /* #E53935 */
+  --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+
+  --border: 45 94% 59%; /* #F9BA32 */
+  --input: 45 94% 59%; /* #F9BA32 */
+  --ring: 45 94% 59%; /* #F9BA32 */
 }
 
 @media (prefers-color-scheme: dark) {
