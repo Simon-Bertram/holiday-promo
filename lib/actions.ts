@@ -38,3 +38,13 @@ export async function subscribe(formData: FormData) {
     await prisma.$disconnect();
   }
 }
+
+export async function getSubscribers() {
+  try {
+    const subscribers = await prisma.subscriber.findMany();
+    return subscribers;
+  } catch (error) {
+    console.error("Error fetching subscribers:", error);
+    return [];
+  }
+}
