@@ -2,6 +2,8 @@
 
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 
 const prisma = new PrismaClient();
 
@@ -46,5 +48,27 @@ export async function getSubscribers() {
   } catch (error) {
     console.error("Error fetching subscribers:", error);
     return [];
+  }
+}
+
+interface AuthenticateProps {
+  username: string;
+  password: string;
+}
+
+export async function authenticate({ username, password }: AuthenticateProps) {
+  try {
+    await signIn("credentials", { username, password });
+    return { message: "Login Success" };
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { message: "Invalid credentials." };
+        default:
+          return { message: "Authentication failed. Please try again." };
+      }
+    }
+    throw error;
   }
 }

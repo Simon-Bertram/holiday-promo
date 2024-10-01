@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authenticate } from "@/lib/actions";
 
 const LoginFormSchema = z.object({
   username: z
@@ -21,13 +23,34 @@ const LoginFormSchema = z.object({
   password: z.string().min(6),
 });
 
+type LoginFormValues = z.infer<typeof LoginFormSchema>;
+
 export default function LoginForm() {
-  const form = useForm<z.infer<typeof LoginFormSchema>>({
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginFormSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
 
-  const onSubmit = (data: z.infer<typeof LoginFormSchema>) => {
-    console.log("Form data: ", data);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    try {
+      await authenticate(data);
+      if (errorMessage) {
+        setErrorMessage(errorMessage);
+      }
+      // Handle successful authentication here
+    } catch (error) {
+      setErrorMessage("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,7 +82,14 @@ export default function LoginForm() {
         ></FormField>
       </form>
 
-      <Button className="mt-4">Submit</Button>
+      <Button type="submit" className="mt-4" disabled={isSubmitting}>
+        {isSubmitting ? "Logging in..." : "Log in"}
+      </Button>
+      {errorMessage && (
+        <>
+          <p className="text-sm text-red-500">{errorMessage}</p>
+        </>
+      )}
     </Form>
   );
 }
