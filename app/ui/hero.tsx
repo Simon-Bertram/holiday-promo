@@ -1,7 +1,11 @@
 import Image from "next/image";
-import Subscribe from "../api/subscribe/subscribe-form";
+import { ReactNode } from "react";
 
-export default function Hero() {
+interface HeroProps {
+  children: ReactNode;
+}
+
+export default function Hero({ children }: HeroProps) {
   return (
     <div className="relative h-screen w-full">
       <picture>
@@ -35,7 +39,7 @@ export default function Hero() {
           Great holidays for you
         </h1>
         <div className="bg-white bg-opacity-30 rounded-md backdrop-blur-sm p-14">
-          <Subscribe />
+          {children}
         </div>
       </div>
     </div>

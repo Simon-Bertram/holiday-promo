@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -13,26 +14,40 @@ const FormSchema = z.object({
 });
 
 export async function subscribe(formData: FormData) {
-  const rawFormData = {
-    email: formData.get("emailAddress"),
+  const validatedFields = FormSchema.safeParse({
     name: formData.get("name"),
-  };
-  console.log("Form data: ", rawFormData);
+    email: formData.get("email"),
+  });
+
+  if (!validatedFields.success) {
+    return { error: "Invalid form data" };
+  }
+
+  const { name, email } = validatedFields.data;
 
   try {
-    // Validate the form data
-    const validatedData = FormSchema.parse(rawFormData);
+    // Check if the email already exists
+    const existingSubscriber = await prisma.subscriber.findUnique({
+      where: { email },
+    });
 
+    if (existingSubscriber) {
+      return { error: "Email already subscribed" };
+    }
     // Insert the data into the database
-    const newSubscriber = await prisma.subscriber.create({
+    await prisma.subscriber.create({
       data: {
-        email: validatedData.email,
-        name: rawFormData.name as string,
+        name,
+        email,
       },
     });
 
-    console.log("New subscriber: ", newSubscriber);
-    return { success: true, subscriber: newSubscriber };
+    console.log("Subscribing:", validatedFields.data);
+
+    // Revalidate the path to update any cached data
+    revalidatePath("/");
+
+    return { success: true };
   } catch (error) {
     console.error("Error creating subscriber:", error);
     return { success: false, error: "Failed to create subscriber" };

@@ -5,6 +5,13 @@ import crypto from "crypto";
 const prisma = new PrismaClient();
 
 async function setupAdmin() {
+  if (process.env.ADMIN_SETUP_COMPLETE === "true") {
+    console.error(
+      "Admin setup has already been completed. Aborting for security reasons."
+    );
+    return;
+  }
+
   const email = "simonbertram@hotmail.com";
   const password = "Catching-cautious-creatures";
 
@@ -25,6 +32,7 @@ async function setupAdmin() {
     });
 
     console.log("Admin user created successfully:", admin);
+    process.env.ADMIN_SETUP_COMPLETE = "true";
   } catch (error) {
     console.error("Error creating admin user:", error);
   } finally {
