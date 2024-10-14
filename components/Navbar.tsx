@@ -1,44 +1,11 @@
 import NavLinks from "@/app/ui/nav-links";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
 const NavBar = () => {
   return (
     <header className="bg-transparent absolute left-0 top-0 right-0 z-10 text-gray-800">
-      <nav className="flex items-center space-between">
+      <nav className="flex items-center justify-center space-between py-4 px-8">
         <NavLinks />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            {" "}
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                alt="Your avatar"
-              />
-              <AvatarFallback>SC</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
-            <DropdownMenuItem>
-              <Button>Logout</Button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </nav>
     </header>
   );

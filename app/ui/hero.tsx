@@ -38,7 +38,7 @@ export default function Hero({ children }: HeroProps) {
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white text-center mb-12">
           Great holidays for you
         </h1>
-        <div className="bg-white bg-opacity-30 rounded-md backdrop-blur-sm p-14">
+        <div className="w-full max-w-[320px] bg-white bg-opacity-30 rounded-md backdrop-blur-sm p-8">
           {children}
         </div>
       </div>

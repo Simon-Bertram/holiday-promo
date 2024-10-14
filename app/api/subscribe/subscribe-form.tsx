@@ -53,7 +53,7 @@ export default function Subscribe() {
             <FormItem>
               <FormLabel className="text-black">Name</FormLabel>
               <FormControl>
-                <Input placeholder="Name" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage>{error}</FormMessage>
             </FormItem>
@@ -65,7 +65,7 @@ export default function Subscribe() {
             <FormItem>
               <FormLabel className="text-black">Email Address</FormLabel>
               <FormControl>
-                <Input placeholder="Email" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage>{error}</FormMessage>
             </FormItem>
