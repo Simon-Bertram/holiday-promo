@@ -41,6 +41,7 @@ export default function LoginForm() {
     setErrorMessage(null);
     try {
       // login logic
+      console.log(data);
       if (errorMessage) {
         setErrorMessage(errorMessage);
       }
