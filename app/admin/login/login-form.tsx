@@ -14,7 +14,6 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { authenticate } from "@/lib/actions";
 
 const LoginFormSchema = z.object({
   username: z
@@ -41,7 +40,7 @@ export default function LoginForm() {
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      await authenticate(data);
+      // login logic
       if (errorMessage) {
         setErrorMessage(errorMessage);
       }
