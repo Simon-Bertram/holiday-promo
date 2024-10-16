@@ -1,5 +1,4 @@
 import NavLinks from "@/app/ui/nav-links";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const NavBar = () => {
   return (
