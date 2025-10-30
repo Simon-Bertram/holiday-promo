@@ -10,7 +10,13 @@ import type { NextRequest } from "next/server";
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
     onError((error) => {
-      console.error(error);
+      console.error("RPC Error:", {
+        message: error.message,
+        code: error.code,
+        statusCode: error.statusCode,
+        cause: error.cause,
+      });
+      // In production, log to external service (e.g., Sentry)
     }),
   ],
 });
@@ -22,25 +28,53 @@ const apiHandler = new OpenAPIHandler(appRouter, {
   ],
   interceptors: [
     onError((error) => {
-      console.error(error);
+      console.error("OpenAPI Error:", {
+        message: error.message,
+        code: error.code,
+        statusCode: error.statusCode,
+        cause: error.cause,
+      });
+      // In production, log to external service (e.g., Sentry)
     }),
   ],
 });
 
 async function handleRequest(req: NextRequest) {
-  const rpcResult = await rpcHandler.handle(req, {
-    prefix: "/api/rpc",
-    context: await createContext(req),
-  });
-  if (rpcResult.response) return rpcResult.response;
+  try {
+    const context = await createContext(req);
 
-  const apiResult = await apiHandler.handle(req, {
-    prefix: "/api/rpc/api-reference",
-    context: await createContext(req),
-  });
-  if (apiResult.response) return apiResult.response;
+    const rpcResult = await rpcHandler.handle(req, {
+      prefix: "/api/rpc",
+      context,
+    });
+    if (rpcResult.response) {
+      return rpcResult.response;
+    }
 
-  return new Response("Not found", { status: 404 });
+    const apiResult = await apiHandler.handle(req, {
+      prefix: "/api/rpc/api-reference",
+      context,
+    });
+    if (apiResult.response) {
+      return apiResult.response;
+    }
+
+    return new Response("Not found", { status: 404 });
+  } catch (error) {
+    console.error("Unexpected error in handleRequest:", error);
+    return new Response(
+      JSON.stringify({
+        message: "Internal server error",
+        ...(process.env.NODE_ENV === "development" && {
+          error: error instanceof Error ? error.message : String(error),
+        }),
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 }
 
 export const GET = handleRequest;

@@ -10,9 +10,17 @@ export default function Dashboard({
 }) {
   const privateData = useQuery(orpc.privateData.queryOptions());
 
-  return (
-    <>
-      <p>API: {privateData.data?.message}</p>
-    </>
-  );
+  if (privateData.isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (privateData.isError) {
+    return (
+      <div className="rounded-md bg-destructive/10 p-4 text-destructive">
+        Failed to load data.
+      </div>
+    );
+  }
+
+  return <p>API: {privateData.data?.message}</p>;
 }
