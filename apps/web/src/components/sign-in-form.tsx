@@ -8,13 +8,43 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
-export default function SignInForm({
-  onSwitchToSignUp,
-}: {
+type SignInFormProps = {
   onSwitchToSignUp: () => void;
-}) {
+};
+
+const MIN_PASSWORD_LENGTH = 10;
+
+const signInSchema = z.object({
+  email: z.email("Invalid email address"),
+  password: z
+    .string()
+    .min(
+      MIN_PASSWORD_LENGTH,
+      `Password must be at least ${MIN_PASSWORD_LENGTH} characters`
+    ),
+});
+
+export default function SignInForm({ onSwitchToSignUp }: SignInFormProps) {
   const router = useRouter();
   const { isPending } = authClient.useSession();
+
+  const handleSubmit = async (value: { email: string; password: string }) => {
+    await authClient.signIn.email(
+      {
+        email: value.email,
+        password: value.password,
+      },
+      {
+        onSuccess: () => {
+          router.push("/dashboard");
+          toast.success("Sign in successful");
+        },
+        onError: (error) => {
+          toast.error(error.error.message || error.error.statusText);
+        },
+      }
+    );
+  };
 
   const form = useForm({
     defaultValues: {
@@ -22,27 +52,10 @@ export default function SignInForm({
       password: "",
     },
     onSubmit: async ({ value }) => {
-      await authClient.signIn.email(
-        {
-          email: value.email,
-          password: value.password,
-        },
-        {
-          onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign in successful");
-          },
-          onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
-          },
-        }
-      );
+      await handleSubmit(value);
     },
     validators: {
-      onSubmit: z.object({
-        email: z.email("Invalid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-      }),
+      onSubmit: signInSchema,
     },
   });
 
@@ -123,7 +136,7 @@ export default function SignInForm({
 
       <div className="mt-4 text-center">
         <Button
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-200 dark:hover:text-indigo-400"
           onClick={onSwitchToSignUp}
           variant="link"
         >
