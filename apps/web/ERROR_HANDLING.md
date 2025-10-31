@@ -1,10 +1,15 @@
 # Error Handling Documentation
 
-This document outlines the error handling strategy implemented in the Holiday Promo application, following Next.js and oRPC best practices.
+This document outlines the error handling strategy implemented in the Holiday Promo application, following [Next.js 16 error handling best practices](https://nextjs.org/docs/app/getting-started/error-handling).
 
 ## Overview
 
-Error handling in this application follows a multi-layered approach:
+Error handling in this application follows Next.js best practices, distinguishing between:
+
+1. **Expected Errors** - Handled as return values or thrown `ORPCError` instances
+2. **Uncaught Exceptions** - Handled by Error Boundaries
+
+Our multi-layered approach includes:
 
 1. **Error Boundaries** - Catch React rendering errors
 2. **API Route Error Handling** - Handle server-side errors
@@ -102,24 +107,37 @@ async function handleRequest(req: NextRequest) {
 
 ### Error Handling in Procedures
 
-Each procedure uses try/catch blocks to handle database errors:
+Following Next.js best practices, we **avoid try/catch for expected errors** and instead handle them explicitly. Unexpected errors (bugs) bubble up to error boundaries automatically.
 
 **Example from todo router**:
 
 ```typescript
 export const todoRouter = {
   getAll: publicProcedure.handler(async () => {
-    try {
-      return await db.select().from(todo);
-    } catch (error) {
-      console.error("Error fetching todos:", error);
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
-        message: "Failed to fetch todos",
+    // Let database errors bubble up to error boundary
+    return await db.select().from(todo);
+  }),
+
+  toggle: publicProcedure.handler(async ({ input }) => {
+    const result = await db
+      .update(todo)
+      .set({ completed: input.completed })
+      .where(eq(todo.id, input.id))
+      .returning();
+
+    // Handle expected error - resource not found
+    if (result.length === 0) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Todo not found",
       });
     }
+
+    return result[0];
   }),
 };
 ```
+
+**Key principle**: Throw `ORPCError` for expected errors (UNAUTHORIZED, NOT_FOUND), let unexpected errors (database failures, bugs) bubble up to be caught by error boundaries.
 
 ### Structured Error Responses
 
@@ -253,52 +271,75 @@ const requireAuth = o.middleware(async ({ context, next }) => {
 
 ## Best Practices
 
+Following [Next.js error handling best practices](https://nextjs.org/docs/app/getting-started/error-handling):
+
 ### ✅ DO
 
-1. **Use error boundaries at module boundaries**
+1. **Handle expected errors as return values or throw ORPCError**
+
+   - Model expected errors (validation failures, not found) as return values
+   - Throw `ORPCError` for structured expected errors
+   - Let unexpected errors (bugs) bubble up to error boundaries
+
+2. **Use error boundaries at module boundaries**
+
    - Place `error.tsx` files where errors should be caught
    - Use `global-error.tsx` for root-level errors
 
-2. **Provide user-friendly error messages**
+3. **Provide user-friendly error messages**
+
    - Avoid technical jargon
    - Offer actionable steps (e.g., "Try again" button)
    - Show helpful context when appropriate
 
-3. **Log errors to external services in production**
+4. **Log errors to external services in production**
+
    - Add Sentry or similar service
    - Include relevant context (user, request, stack trace)
    - Filter sensitive information
 
-4. **Use try/catch for parsing operations**
+5. **Use try/catch ONLY for parsing operations**
+
    - JSON parsing
    - Date parsing
    - Number conversion
+   - **Not for rendering or data fetching**
 
-5. **Handle async errors properly**
-   - Use try/catch in async functions
+6. **Handle async errors properly**
+
    - Use onError callbacks in React Query mutations
+   - Let Server Component errors bubble to boundaries
 
-6. **Return appropriate error codes**
-   - Use ORPCError for structured errors
+7. **Return appropriate error codes**
+   - Use ORPCError for structured expected errors
    - Return proper HTTP status codes
 
 ### ❌ DON'T
 
-1. **Don't use try/catch for rendering logic**
+1. **Don't use try/catch for rendering logic or Server Components**
+
    - Error boundaries handle rendering errors
    - Don't wrap Server Component rendering in try/catch
+   - Don't wrap data fetching in Server Components with try/catch
 
-2. **Don't show technical error messages to users in production**
+2. **Don't model uncaught exceptions as return values**
+
+   - Uncaught exceptions indicate bugs - let them bubble to error boundaries
+   - Only use return values for expected errors (validation, etc.)
+
+3. **Don't show technical error messages to users in production**
+
    - Hide stack traces
    - Sanitize error messages
    - Use environment checks
 
-3. **Don't swallow errors**
+4. **Don't swallow errors**
+
    - Always log errors
    - Re-throw errors when appropriate
    - Don't use empty catch blocks
 
-4. **Don't rely solely on console.error in production**
+5. **Don't rely solely on console.error in production**
    - Implement proper error tracking
    - Monitor error rates
    - Alert on critical errors
@@ -306,16 +347,19 @@ const requireAuth = o.middleware(async ({ context, next }) => {
 ## Future Improvements
 
 1. **Error Tracking Service Integration**
+
    - Add Sentry or similar service
    - Implement error grouping and deduplication
    - Set up alerts for critical errors
 
 2. **Error Analytics**
+
    - Track error rates per route
    - Monitor error trends over time
    - Identify common error patterns
 
 3. **Enhanced Error Messages**
+
    - Localization support
    - Context-specific messages
    - Suggested solutions
@@ -344,4 +388,3 @@ To test error handling:
 - Context: `packages/api/src/context.ts`
 - Middleware: `packages/api/src/index.ts`
 - Query Client: `apps/web/src/utils/orpc.ts`
-
