@@ -1,8 +1,12 @@
+"use client";
+
 import { Button } from "../ui/button";
+import VideoBg from "./video-bg";
 
 export default function Hero() {
   return (
-    <div>
+    <div className="relative">
+      <VideoBg />
       <h1 className="text-center font-bold text-4xl">
         Unlock your best holiday yet
       </h1>
