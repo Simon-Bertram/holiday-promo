@@ -1,57 +1,40 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import Hero from "@/components/hero/hero";
-import Loader from "@/components/loader";
-import SignInForm from "@/components/sign-in-form";
-import SignUpForm from "@/components/sign-up-form";
-import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 
 const TITLE_TEXT = "Join the holiday rush";
 
 export default function Home() {
-  const [showSignIn, setShowSignIn] = useState(false);
-  const session = authClient.useSession();
   const healthCheck = useQuery(orpc.healthCheck.queryOptions());
 
-  if (session.isPending) {
-    return <Loader />;
-  }
-
-  if (!session.data?.user) {
-    return showSignIn ? (
-      <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
-    ) : (
-      <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
-    );
-  }
-
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-2">
+    <>
       <Hero />
-      <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-      <div className="grid gap-6">
-        <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
-          <div className="flex items-center gap-2">
-            <div
-              className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
-            />
-            {(() => {
-              let statusText = "Checking...";
-              if (!healthCheck.isLoading) {
-                statusText = healthCheck.data ? "Connected" : "Disconnected";
-              }
-              return (
-                <span className="text-muted-foreground text-sm">
-                  {statusText}
-                </span>
-              );
-            })()}
-          </div>
-        </section>
+      <div className="container mx-auto max-w-3xl px-4 py-2">
+        <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
+        <div className="grid gap-6">
+          <section className="rounded-lg border p-4">
+            <h2 className="mb-2 font-medium">API Status</h2>
+            <div className="flex items-center gap-2">
+              <div
+                className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
+              />
+              {(() => {
+                let statusText = "Checking...";
+                if (!healthCheck.isLoading) {
+                  statusText = healthCheck.data ? "Connected" : "Disconnected";
+                }
+                return (
+                  <span className="text-muted-foreground text-sm">
+                    {statusText}
+                  </span>
+                );
+              })()}
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
