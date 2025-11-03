@@ -1,33 +1,22 @@
 "use client";
-import Link from "next/link";
 import Logo from "./logo";
 import { ModeToggle } from "./mode-toggle";
+import NavItems from "./navigation/nav-items";
 import UserMenu from "./user-menu";
 
 export default function Header() {
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
-    { to: "/todos", label: "Todos" },
-  ] as const;
-
   return (
-    <div className="relative z-10">
-      <div className="flex flex-row items-center justify-between px-2 py-1">
-        <nav className="flex gap-4 text-lg">
+    <div className="fixed inset-x-0 top-0 z-20">
+      <div className="flex flex-row items-center justify-between bg-transparent px-2 py-1">
+        <nav className="my-2 flex gap-4 bg-transparent align-middle font-black text-white text-xl drop-shadow">
           <Logo />
-          {links.map(({ to, label }) => (
-            <Link href={to} key={to}>
-              {label}
-            </Link>
-          ))}
+          <NavItems />
         </nav>
         <div className="flex items-center gap-2">
           <ModeToggle />
           <UserMenu />
         </div>
       </div>
-      <hr />
     </div>
   );
 }
