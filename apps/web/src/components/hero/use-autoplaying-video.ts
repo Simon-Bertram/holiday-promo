@@ -43,24 +43,36 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
   const HAVE_CURRENT_DATA = 2;
 
   // Attempt to play a specific video element and reflect whether user gesture is needed
-  const playVideo = useCallback(
-    (videoEl: HTMLVideoElement) =>
-      videoEl
-        .play()
-        .then(() => {
-          setNeedsUserGesture(false);
-          return true;
-        })
-        .catch((error: unknown) => {
-          console.warn(
-            "Autoplay was blocked. Prompting user interaction.",
-            error
-          );
-          setNeedsUserGesture(true);
-          return false;
-        }),
-    []
-  );
+  const playVideo = useCallback((videoEl: HTMLVideoElement) => {
+    // Respect reduced motion preferences: do not autoplay
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) {
+      setNeedsUserGesture(false);
+      return Promise.resolve(false);
+    }
+
+    // Avoid autoplay when the tab/page is not visible
+    if (document.visibilityState !== "visible") {
+      return Promise.resolve(false);
+    }
+
+    return videoEl
+      .play()
+      .then(() => {
+        setNeedsUserGesture(false);
+        return true;
+      })
+      .catch((error: unknown) => {
+        console.warn(
+          "Autoplay was blocked. Prompting user interaction.",
+          error
+        );
+        setNeedsUserGesture(true);
+        return false;
+      });
+  }, []);
 
   useEffect(() => {
     const containerEl = containerRef.current;
@@ -97,6 +109,9 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       videoEl.muted = true;
       videoEl.playsInline = true;
       videoEl.autoplay = true;
+      // iOS Safari robustness: also set attributes explicitly
+      videoEl.setAttribute("playsinline", "");
+      videoEl.setAttribute("webkit-playsinline", "");
 
       // Wait for video to be ready before attempting autoplay
       if (videoEl.readyState >= HAVE_CURRENT_DATA) {
@@ -146,6 +161,25 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
 
     setupVideo();
 
+    // Pause on page hide, try to resume on visible if in view
+    const handleVisibility = () => {
+      const video = containerEl.querySelector(
+        "video"
+      ) as HTMLVideoElement | null;
+      if (!video) {
+        return;
+      }
+      if (document.visibilityState === "hidden") {
+        video.pause();
+      } else {
+        // Only try resuming if it's intersecting enough; IO callback will also cover this
+        playVideo(video).catch(() => {
+          /* handled in playVideo */
+        });
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
     // Cleanup function
     return () => {
       if (timeoutId !== null) {
@@ -157,6 +191,7 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       if (videoEl && canPlayHandler) {
         videoEl.removeEventListener("canplay", canPlayHandler);
       }
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [visibilityThreshold, maxRetries, retryIntervalMs, playVideo]);
 

@@ -2,34 +2,67 @@
 
 import { CldVideoPlayer } from "next-cloudinary";
 import "next-cloudinary/dist/cld-video-player.css";
+import { useEffect, useState } from "react";
 import { useAutoplayingCloudinaryVideo } from "./use-autoplaying-video";
 
 export default function VideoBg() {
   const { containerRef, needsUserGesture, handleUserPlay } =
     useAutoplayingCloudinaryVideo();
 
+  // Detect mobile viewport (match Tailwind's md breakpoint at 768px)
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+
   return (
     <div
       className="absolute inset-0 h-full w-full overflow-hidden"
       ref={containerRef}
     >
-      <CldVideoPlayer
-        aria-label="Hero Background video"
-        autoPlay
-        className="h-full w-full object-cover"
-        controls={false}
-        height="1080"
-        id="hero-video"
-        loop
-        muted
-        onError={(error: unknown) => {
-          console.error("Video error:", error);
-        }}
-        playsinline
-        preload="auto"
-        src="https://res.cloudinary.com/dulwhlyqt/video/upload/q_auto,f_auto/7677655-hd_1920_1080_25fps_altt0g.mp4"
-        width="1920"
-      />
+      {isMobile ? (
+        <CldVideoPlayer
+          aria-label="Hero Background video (mobile)"
+          autoPlay={true}
+          className="h-full w-full object-cover"
+          controls={false}
+          height="1920"
+          id="hero-video-mobile"
+          loop={true}
+          muted={true}
+          onError={(error: unknown) => {
+            console.error("Video error:", error);
+          }}
+          playsinline
+          preload="auto"
+          src="https://res.cloudinary.com/dulwhlyqt/video/upload/q_auto,f_auto/12529111_1080_1920_60fps_iamdrc.mp4"
+          width="1080"
+        />
+      ) : (
+        <CldVideoPlayer
+          aria-label="Hero Background video"
+          autoPlay
+          className="h-full w-full object-cover"
+          controls={false}
+          height="1080"
+          id="hero-video"
+          loop
+          muted
+          onError={(error: unknown) => {
+            console.error("Video error:", error);
+          }}
+          playsinline
+          preload="auto"
+          src="https://res.cloudinary.com/dulwhlyqt/video/upload/q_auto,f_auto/7677655-hd_1920_1080_25fps_altt0g.mp4"
+          width="1920"
+        />
+      )}
+
       {needsUserGesture ? (
         <button
           aria-label="Play background video"
