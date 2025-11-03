@@ -4,9 +4,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans:
-    "Inter", "Geist", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
@@ -131,5 +130,13 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Ensure Cloudinary player fills its container and covers without letterboxing */
+  .cld-video-player,
+  .cld-video-player .vjs-tech,
+  .cld-video-player video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 }

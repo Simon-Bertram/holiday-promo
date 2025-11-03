@@ -98,6 +98,7 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
     let videoEl: HTMLVideoElement | null = findVideoElement();
     let retryCount = 0;
     let observer: IntersectionObserver | null = null;
+    let mutationObserver: MutationObserver | null = null;
     let canPlayHandler: (() => void) | null = null;
     let timeoutId: number | null = null;
 
@@ -136,8 +137,31 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       video.pause();
     };
 
+    const startMutationObserver = () => {
+      if (mutationObserver) {
+        return;
+      }
+      mutationObserver = new MutationObserver(() => {
+        const candidate = findVideoElement();
+        if (!candidate) {
+          return;
+        }
+        videoEl = candidate;
+        setupVideo();
+        if (mutationObserver) {
+          mutationObserver.disconnect();
+          mutationObserver = null;
+        }
+      });
+      mutationObserver.observe(containerEl, {
+        childList: true,
+        subtree: true,
+      });
+    };
+
     const setupVideo = () => {
       if (!videoEl) {
+        // Keep polling for a bounded time window
         if (retryCount < maxRetries) {
           retryCount += 1;
           timeoutId = window.setTimeout(() => {
@@ -147,6 +171,8 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
             }
           }, retryIntervalMs);
         }
+        // Also observe DOM mutations so we catch late renders
+        startMutationObserver();
         return;
       }
 
@@ -222,6 +248,9 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       }
       if (observer) {
         observer.disconnect();
+      }
+      if (mutationObserver) {
+        mutationObserver.disconnect();
       }
       if (videoEl && canPlayHandler) {
         videoEl.removeEventListener("canplay", canPlayHandler);

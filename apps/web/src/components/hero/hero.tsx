@@ -6,7 +6,7 @@ import VideoBg from "./video-bg";
 
 export default function Hero() {
   return (
-    <div className="h-screen w-full">
+    <div className="relative min-h-[100dvh] w-full">
       <VideoBg />
       <div className="absolute right-10 bottom-30 z-10 flex flex-col rounded-lg bg-black/70 p-6 text-white">
         <h1 className="mb-4 font-black text-4xl">

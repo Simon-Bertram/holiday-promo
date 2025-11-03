@@ -7,18 +7,28 @@ import { useAutoplayingCloudinaryVideo } from "./use-autoplaying-video";
 
 export default function VideoBg() {
   const { containerRef, needsUserGesture, handleUserPlay } =
-    useAutoplayingCloudinaryVideo({ autoplayMode: "on-scroll" });
+    useAutoplayingCloudinaryVideo({
+      autoplayMode: "on-scroll",
+      maxRetries: 100,
+    });
 
   // Detect mobile viewport (match Tailwind's md breakpoint at 768px)
   const [isMobile, setIsMobile] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
     const mql = window.matchMedia("(max-width: 767px)");
     const update = () => setIsMobile(mql.matches);
     update();
     mql.addEventListener("change", update);
     return () => mql.removeEventListener("change", update);
   }, []);
+
+  // Avoid rendering the wrong player during SSR/first paint on mobile
+  if (!hasMounted) {
+    return null;
+  }
 
   return (
     <div
@@ -31,8 +41,10 @@ export default function VideoBg() {
           autoPlay
           className="h-full w-full object-cover"
           controls={false}
+          fluid={false}
           height="1920"
           id="hero-video-mobile"
+          key="hero-video-mobile"
           loop={true}
           muted={true}
           onError={(error: unknown) => {
@@ -50,8 +62,10 @@ export default function VideoBg() {
           autoPlay
           className="h-full w-full object-cover"
           controls={false}
+          fluid={false}
           height="1080"
           id="hero-video"
+          key="hero-video-desktop"
           loop
           muted
           onError={(error: unknown) => {
