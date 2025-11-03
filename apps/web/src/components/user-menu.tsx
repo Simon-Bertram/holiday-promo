@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useNavigation } from "@/app/hooks/use-navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import { Skeleton } from "./ui/skeleton";
 export default function UserMenu() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const { closeMobileMenu } = useNavigation();
 
   if (isPending) {
     return <Skeleton className="h-9 w-24" />;
@@ -23,7 +25,9 @@ export default function UserMenu() {
   if (!session) {
     return (
       <Button asChild>
-        <Link href="/login">Sign In</Link>
+        <Link href="/login" onClick={closeMobileMenu}>
+          Sign In
+        </Link>
       </Button>
     );
   }

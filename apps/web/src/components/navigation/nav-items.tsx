@@ -14,25 +14,31 @@ export const navItems: NavItem[] = [
   { href: "/todos", label: "Todos" },
 ];
 
-export default function NavItems() {
+type NavItemsProps = {
+  className?: string;
+  onItemClick?: () => void;
+};
+
+export default function NavItems({ className, onItemClick }: NavItemsProps) {
   const pathname = usePathname();
 
   const isCurrentPage = (href: string) => pathname === href;
 
   return (
-    <>
-      {navItems.map(({ href, label }) => (
+    <div className={className}>
+      {navItems.map((item: NavItem) => (
         <Link
           className={cn(
-            `${montserrat.variable} font-black text-xl antialiased transition-colors hover:text-zinc-200 dark:hover:text-zinc-300`,
-            isCurrentPage(href) && "text-zinc-200 dark:text-zinc-300"
+            `${montserrat.variable} font-black text-xl antialiased transition-colors hover:text-zinc-700 dark:hover:text-zinc-300`,
+            isCurrentPage(item.href) && "text-black dark:text-zinc-300"
           )}
-          href={href}
-          key={href}
+          href={item.href}
+          key={item.href}
+          onClick={onItemClick}
         >
-          {label}
+          {item.label}
         </Link>
       ))}
-    </>
+    </div>
   );
 }
