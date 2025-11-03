@@ -1,11 +1,34 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+/**
+ * Options to control autoplay behavior for the Cloudinary video player.
+ */
 type AutoplayOptions = {
+  /**
+   * Minimum intersection ratio required to keep the video playing.
+   * Defaults to 0.5 (50% visible).
+   */
   visibilityThreshold?: number;
+  /**
+   * Maximum number of polling attempts while waiting for the video element
+   * to be rendered by the Cloudinary player. Defaults to 20.
+   */
   maxRetries?: number;
+  /**
+   * Milliseconds between polling attempts. Defaults to 100ms.
+   */
   retryIntervalMs?: number;
 };
 
+/**
+ * Hook to autoplay a Cloudinary video element rendered inside a container.
+ *
+ * The hook:
+ * - Polls for the underlying <video> tag (rendered asynchronously)
+ * - Ensures attributes required for autoplay (muted, playsInline, autoplay)
+ * - Attempts to play when ready and when sufficiently visible
+ * - Exposes a user action handler to retry playback when browsers block autoplay
+ */
 export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
   const {
     visibilityThreshold = 0.5,
@@ -16,15 +39,38 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [needsUserGesture, setNeedsUserGesture] = useState(false);
 
+  // HTMLMediaElement.HAVE_CURRENT_DATA === 2
+  const HAVE_CURRENT_DATA = 2;
+
+  // Attempt to play a specific video element and reflect whether user gesture is needed
+  const playVideo = useCallback(
+    (videoEl: HTMLVideoElement) =>
+      videoEl
+        .play()
+        .then(() => {
+          setNeedsUserGesture(false);
+          return true;
+        })
+        .catch((error: unknown) => {
+          console.warn(
+            "Autoplay was blocked. Prompting user interaction.",
+            error
+          );
+          setNeedsUserGesture(true);
+          return false;
+        }),
+    []
+  );
+
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) {
+    const containerEl = containerRef.current;
+    if (!containerEl) {
       return;
     }
 
     // Cloudinary player renders asynchronously, so we need to wait for the video element
     const findVideoElement = (): HTMLVideoElement | null =>
-      container.querySelector("video") as HTMLVideoElement | null;
+      containerEl.querySelector("video") as HTMLVideoElement | null;
 
     // Poll for video element (since CldVideoPlayer renders it asynchronously)
     let videoEl: HTMLVideoElement | null = findVideoElement();
@@ -52,33 +98,20 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       videoEl.playsInline = true;
       videoEl.autoplay = true;
 
-      // Function to attempt autoplay
-      const attemptAutoplay = () => {
-        if (!videoEl) {
-          return;
-        }
-        videoEl
-          .play()
-          .then(() => {
-            setNeedsUserGesture(false);
-          })
-          .catch((error: unknown) => {
-            console.warn(
-              "Autoplay was blocked. Prompting user interaction.",
-              error
-            );
-            setNeedsUserGesture(true);
-          });
-      };
-
       // Wait for video to be ready before attempting autoplay
-      if (videoEl.readyState >= 2) {
+      if (videoEl.readyState >= HAVE_CURRENT_DATA) {
         // HAVE_CURRENT_DATA - video has enough data to play
-        attemptAutoplay();
+        playVideo(videoEl).catch(() => {
+          /* handled in playVideo */
+        });
       } else {
         // Wait for video to load enough data
         const handleCanPlay = () => {
-          attemptAutoplay();
+          if (videoEl) {
+            playVideo(videoEl).catch(() => {
+              /* handled in playVideo */
+            });
+          }
           if (canPlayHandler && videoEl) {
             videoEl.removeEventListener("canplay", canPlayHandler);
           }
@@ -98,18 +131,9 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
             entry.isIntersecting &&
             entry.intersectionRatio >= visibilityThreshold
           ) {
-            videoEl
-              .play()
-              .then(() => {
-                setNeedsUserGesture(false);
-              })
-              .catch((error: unknown) => {
-                console.warn(
-                  "Autoplay was blocked. Prompting user interaction.",
-                  error
-                );
-                setNeedsUserGesture(true);
-              });
+            playVideo(videoEl).catch(() => {
+              /* handled in playVideo */
+            });
           } else {
             videoEl.pause();
           }
@@ -117,7 +141,7 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
         { threshold: visibilityThreshold }
       );
 
-      observer.observe(container);
+      observer.observe(containerEl);
     };
 
     setupVideo();
@@ -134,25 +158,20 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
         videoEl.removeEventListener("canplay", canPlayHandler);
       }
     };
-  }, [visibilityThreshold, maxRetries, retryIntervalMs]);
+  }, [visibilityThreshold, maxRetries, retryIntervalMs, playVideo]);
 
   const handleUserPlay = useCallback(() => {
-    const container = containerRef.current;
-    const videoEl = container?.querySelector(
+    const containerEl = containerRef.current;
+    const videoEl = containerEl?.querySelector(
       "video"
     ) as HTMLVideoElement | null;
     if (!videoEl) {
       return;
     }
-    videoEl
-      .play()
-      .then(() => {
-        setNeedsUserGesture(false);
-      })
-      .catch(() => {
-        // stay visible; user may try again
-      });
-  }, []);
+    playVideo(videoEl).catch(() => {
+      /* handled in playVideo */
+    });
+  }, [playVideo]);
 
   return { containerRef, needsUserGesture, handleUserPlay };
 }
