@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 /**
  * Options to control autoplay behavior for the Cloudinary video player.
  */
+type AutoplayMode = "on-scroll" | "viewable" | "always" | "never";
+
 type AutoplayOptions = {
   /**
    * Minimum intersection ratio required to keep the video playing.
@@ -18,6 +20,13 @@ type AutoplayOptions = {
    * Milliseconds between polling attempts. Defaults to 100ms.
    */
   retryIntervalMs?: number;
+  /**
+   * Cloudinary-like autoplay mode semantics:
+   * - 'on-scroll' | 'viewable': play when sufficiently visible
+   * - 'always': try to play whenever possible
+   * - 'never': do not autoplay (user gesture only)
+   */
+  autoplayMode?: AutoplayMode;
 };
 
 /**
@@ -34,6 +43,7 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
     visibilityThreshold = 0.5,
     maxRetries = 20,
     retryIntervalMs = 100,
+    autoplayMode = "always",
   } = options;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -91,6 +101,41 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
     let canPlayHandler: (() => void) | null = null;
     let timeoutId: number | null = null;
 
+    const configureAutoplayByMode = (
+      video: HTMLVideoElement,
+      container: HTMLDivElement
+    ) => {
+      if (autoplayMode === "on-scroll" || autoplayMode === "viewable") {
+        observer = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            if (!(entry && video)) {
+              return;
+            }
+            if (
+              entry.isIntersecting &&
+              entry.intersectionRatio >= visibilityThreshold
+            ) {
+              playVideo(video).catch(() => {
+                /* handled in playVideo */
+              });
+            } else {
+              video.pause();
+            }
+          },
+          { threshold: visibilityThreshold }
+        );
+        observer.observe(container);
+        return;
+      }
+      if (autoplayMode === "always") {
+        // No intersection gating; visibilitychange handler below will pause on hidden.
+        return;
+      }
+      // 'never'
+      video.pause();
+    };
+
     const setupVideo = () => {
       if (!videoEl) {
         if (retryCount < maxRetries) {
@@ -116,13 +161,15 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       // Wait for video to be ready before attempting autoplay
       if (videoEl.readyState >= HAVE_CURRENT_DATA) {
         // HAVE_CURRENT_DATA - video has enough data to play
-        playVideo(videoEl).catch(() => {
-          /* handled in playVideo */
-        });
+        if (autoplayMode !== "never") {
+          playVideo(videoEl).catch(() => {
+            /* handled in playVideo */
+          });
+        }
       } else {
         // Wait for video to load enough data
         const handleCanPlay = () => {
-          if (videoEl) {
+          if (videoEl && autoplayMode !== "never") {
             playVideo(videoEl).catch(() => {
               /* handled in playVideo */
             });
@@ -135,28 +182,7 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
         videoEl.addEventListener("canplay", canPlayHandler);
       }
 
-      // Set up Intersection Observer for visibility-based play/pause
-      observer = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          if (!(entry && videoEl)) {
-            return;
-          }
-          if (
-            entry.isIntersecting &&
-            entry.intersectionRatio >= visibilityThreshold
-          ) {
-            playVideo(videoEl).catch(() => {
-              /* handled in playVideo */
-            });
-          } else {
-            videoEl.pause();
-          }
-        },
-        { threshold: visibilityThreshold }
-      );
-
-      observer.observe(containerEl);
+      configureAutoplayByMode(videoEl, containerEl);
     };
 
     setupVideo();
@@ -171,8 +197,17 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       }
       if (document.visibilityState === "hidden") {
         video.pause();
-      } else {
-        // Only try resuming if it's intersecting enough; IO callback will also cover this
+        return;
+      }
+      // Resume behavior depends on autoplayMode
+      if (autoplayMode === "always") {
+        playVideo(video).catch(() => {
+          /* handled in playVideo */
+        });
+        return;
+      }
+      if (autoplayMode === "on-scroll" || autoplayMode === "viewable") {
+        // IO callback will handle when intersecting, but try in case already in view
         playVideo(video).catch(() => {
           /* handled in playVideo */
         });
@@ -193,7 +228,13 @@ export function useAutoplayingCloudinaryVideo(options: AutoplayOptions = {}) {
       }
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [visibilityThreshold, maxRetries, retryIntervalMs, playVideo]);
+  }, [
+    visibilityThreshold,
+    maxRetries,
+    retryIntervalMs,
+    autoplayMode,
+    playVideo,
+  ]);
 
   const handleUserPlay = useCallback(() => {
     const containerEl = containerRef.current;

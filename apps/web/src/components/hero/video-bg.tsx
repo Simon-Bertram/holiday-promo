@@ -7,7 +7,7 @@ import { useAutoplayingCloudinaryVideo } from "./use-autoplaying-video";
 
 export default function VideoBg() {
   const { containerRef, needsUserGesture, handleUserPlay } =
-    useAutoplayingCloudinaryVideo();
+    useAutoplayingCloudinaryVideo({ autoplayMode: "on-scroll" });
 
   // Detect mobile viewport (match Tailwind's md breakpoint at 768px)
   const [isMobile, setIsMobile] = useState(false);
@@ -28,7 +28,7 @@ export default function VideoBg() {
       {isMobile ? (
         <CldVideoPlayer
           aria-label="Hero Background video (mobile)"
-          autoPlay={true}
+          autoPlay
           className="h-full w-full object-cover"
           controls={false}
           height="1920"
@@ -40,7 +40,8 @@ export default function VideoBg() {
           }}
           playsinline
           preload="auto"
-          src="https://res.cloudinary.com/dulwhlyqt/video/upload/q_auto,f_auto/12529111_1080_1920_60fps_iamdrc.mp4"
+          sourceTypes={["mp4"]}
+          src="https://res.cloudinary.com/dulwhlyqt/video/upload/q_auto,f_mp4/12529111_1080_1920_60fps_iamdrc.mp4"
           width="1080"
         />
       ) : (
@@ -58,6 +59,7 @@ export default function VideoBg() {
           }}
           playsinline
           preload="auto"
+          sourceTypes={["mp4"]}
           src="https://res.cloudinary.com/dulwhlyqt/video/upload/q_auto,f_auto/7677655-hd_1920_1080_25fps_altt0g.mp4"
           width="1920"
         />
