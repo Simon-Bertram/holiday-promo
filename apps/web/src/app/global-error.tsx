@@ -37,7 +37,6 @@ export default function GlobalError({
             We encountered an unexpected error. Please try again.
           </p>
           <button
-            type="button"
             onClick={reset}
             style={{
               padding: "0.5rem 1rem",
@@ -47,6 +46,7 @@ export default function GlobalError({
               borderRadius: "0.25rem",
               cursor: "pointer",
             }}
+            type="button"
           >
             Try again
           </button>
