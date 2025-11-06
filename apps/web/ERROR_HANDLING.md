@@ -43,6 +43,7 @@ Error boundaries are React components that catch JavaScript errors in their chil
 
 - **Dashboard**: `apps/web/src/app/dashboard/error.tsx`
 - **Todos**: `apps/web/src/app/todos/error.tsx`
+- **Login**: `apps/web/src/app/login/error.tsx`
 
 These catch errors in specific routes and provide contextual error messages.
 
@@ -165,6 +166,56 @@ if (result.length === 0) {
 ```
 
 ## Client-side Error Handling
+
+### Authentication Error Handling
+
+Authentication errors are handled using a structured approach similar to oRPC error handling patterns:
+
+**Location**: `apps/web/src/lib/errors/auth-errors.ts`
+
+```typescript
+// Normalize Better Auth errors to structured format
+const normalizedError = normalizeAuthError(error);
+
+// Log error for monitoring
+logAuthError(normalizedError, { email, timestamp });
+
+// Show user-friendly error message
+toast.error(normalizedError.message);
+```
+
+**Error Types**:
+
+- `INVALID_CREDENTIALS` - Invalid email or password
+- `UNAUTHORIZED` - Authentication required
+- `ACCOUNT_LOCKED` - Account temporarily locked
+- `EMAIL_NOT_VERIFIED` - Email verification required
+- `NETWORK_ERROR` - Connection issues
+- `UNKNOWN_ERROR` - Unexpected errors
+
+**Usage in hooks** (`apps/web/src/hooks/use-sign-in.ts`):
+
+```typescript
+export function useSignIn() {
+  const signIn = async (data: SignInFormData) => {
+    try {
+      await authClient.signIn.email(data, {
+        onSuccess: () => router.push("/dashboard"),
+        onError: (error) => {
+          const normalizedError = normalizeAuthError(error);
+          logAuthError(normalizedError, { email: data.email });
+          toast.error(normalizedError.message);
+        },
+      });
+    } catch (error) {
+      // Handle unexpected errors
+      const normalizedError = normalizeAuthError(error);
+      logAuthError(normalizedError, { email: data.email });
+      toast.error(normalizedError.message);
+    }
+  };
+}
+```
 
 ### React Query Error Handling
 
@@ -383,8 +434,11 @@ To test error handling:
 - Error Boundaries: `apps/web/src/app/error.tsx`
 - Global Error: `apps/web/src/app/global-error.tsx`
 - Not Found: `apps/web/src/app/not-found.tsx`
+- Login Error: `apps/web/src/app/login/error.tsx`
 - API Routes: `apps/web/src/app/api/rpc/[[...rest]]/route.ts`
 - Todo Router: `packages/api/src/routers/todo.ts`
 - Context: `packages/api/src/context.ts`
 - Middleware: `packages/api/src/index.ts`
 - Query Client: `apps/web/src/utils/orpc.ts`
+- Auth Error Utilities: `apps/web/src/lib/errors/auth-errors.ts`
+- Sign In Hook: `apps/web/src/hooks/use-sign-in.ts`
