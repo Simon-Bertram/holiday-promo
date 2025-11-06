@@ -62,7 +62,9 @@ export default function LoginError({
               Try again
             </Button>
             <Button
-              onClick={() => (window.location.href = "/")}
+              onClick={() => {
+                window.location.href = "/";
+              }}
               variant="outline"
             >
               Go home

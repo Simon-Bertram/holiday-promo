@@ -8,8 +8,12 @@ export default function LoginPage() {
   const [showSignIn, setShowSignIn] = useState(false);
 
   return showSignIn ? (
-    <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
+    <div className="mx-auto mt-40 max-w-md">
+      <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
+    </div>
   ) : (
-    <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
+    <div className="flex flex-col items-center">
+      <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
+    </div>
   );
 }

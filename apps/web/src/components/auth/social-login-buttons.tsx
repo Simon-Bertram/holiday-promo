@@ -40,11 +40,13 @@ export function SocialLoginButtons() {
     <Field className="grid gap-4 sm:grid-cols-2">
       <Button onClick={handleMetaLogin} type="button" variant="outline">
         <MetaIcon />
+        Meta
         <span className="sr-only">Login with Meta</span>
       </Button>
       <Button onClick={handleGoogleLogin} type="button" variant="outline">
         <GoogleIcon />
-        Continue with Google
+        Google
+        <span className="sr-only">Login with Google</span>
       </Button>
     </Field>
   );

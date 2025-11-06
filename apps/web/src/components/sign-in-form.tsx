@@ -43,7 +43,7 @@ export default function SignInForm({
   }
 
   return (
-    <Card className="flex max-w-md flex-col gap-6 p-6">
+    <Card className="mt-8 flex flex-col gap-6 p-6">
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <FieldGroup>
           <CardHeader className="flex flex-col items-center gap-2 text-center">
@@ -71,7 +71,7 @@ export default function SignInForm({
               </button>
             </FieldDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -111,7 +111,10 @@ export default function SignInForm({
                 {form.formState.isSubmitting ? "Signing in..." : "Login"}
               </Button>
             </Field>
-            <FieldSeparator>Or</FieldSeparator>
+            <FieldSeparator className="my-4">Or</FieldSeparator>
+            <FieldDescription className="text-center">
+              Continue with
+            </FieldDescription>
             <SocialLoginButtons />
           </CardContent>
           <CardFooter>
