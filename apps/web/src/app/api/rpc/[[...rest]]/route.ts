@@ -11,10 +11,16 @@ const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
     onError((error) => {
       console.error("RPC Error:", {
-        message: error.message,
-        code: error.code,
-        statusCode: error.statusCode,
-        cause: error.cause,
+        message: error instanceof Error ? error.message : String(error),
+        code:
+          typeof error === "object" && error !== null && "code" in error
+            ? error.code
+            : undefined,
+        statusCode:
+          typeof error === "object" && error !== null && "statusCode" in error
+            ? error.statusCode
+            : undefined,
+        cause: error instanceof Error ? error.cause : undefined,
       });
       // In production, log to external service (e.g., Sentry)
     }),
@@ -29,10 +35,16 @@ const apiHandler = new OpenAPIHandler(appRouter, {
   interceptors: [
     onError((error) => {
       console.error("OpenAPI Error:", {
-        message: error.message,
-        code: error.code,
-        statusCode: error.statusCode,
-        cause: error.cause,
+        message: error instanceof Error ? error.message : String(error),
+        code:
+          typeof error === "object" && error !== null && "code" in error
+            ? error.code
+            : undefined,
+        statusCode:
+          typeof error === "object" && error !== null && "statusCode" in error
+            ? error.statusCode
+            : undefined,
+        cause: error instanceof Error ? error.cause : undefined,
       });
       // In production, log to external service (e.g., Sentry)
     }),
