@@ -9,6 +9,7 @@ export function useSignUp() {
   const signUp = async (data: SignUpFormData) => {
     await authClient.signUp.email(
       {
+        name: data.name,
         email: data.email,
         password: data.password,
       },

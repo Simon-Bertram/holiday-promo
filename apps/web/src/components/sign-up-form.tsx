@@ -1,160 +1,144 @@
-import { useForm } from "@tanstack/react-form";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GalleryVerticalEnd } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useSignUp } from "@/hooks/use-sign-up";
 import { authClient } from "@/lib/auth-client";
+import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth";
+import { SocialLoginButtons } from "./auth/social-login-buttons";
 import Loader from "./loader";
 import { Button } from "./ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "./ui/field";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 
-export default function SignUpForm({
+export default function SignInForm({
   onSwitchToSignIn,
 }: {
   onSwitchToSignIn: () => void;
 }) {
-  const router = useRouter();
   const { isPending } = authClient.useSession();
+  const { signUp } = useSignUp();
 
-  const form = useForm({
+  const form = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
-      name: "",
-    },
-    onSubmit: async ({ value }) => {
-      await authClient.signUp.email(
-        {
-          email: value.email,
-          password: value.password,
-          name: value.name,
-        },
-        {
-          onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign up successful");
-          },
-          onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
-          },
-        }
-      );
-    },
-    validators: {
-      onSubmit: z.object({
-        name: z.string().min(2, "Name must be at least 2 characters"),
-        email: z.email("Invalid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-      }),
     },
   });
+
+  const handleSubmit = async (data: SignUpFormData) => {
+    await signUp(data);
+  };
 
   if (isPending) {
     return <Loader />;
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-md p-6">
-      <h1 className="mb-6 text-center font-bold text-3xl">Create Account</h1>
-
-      <form
-        className="space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-      >
-        <div>
-          <form.Field name="name">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Name</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  value={field.state.value}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p className="text-red-500" key={error?.message}>
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
-
-        <div>
-          <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  type="email"
-                  value={field.state.value}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p className="text-red-500" key={error?.message}>
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
-
-        <div>
-          <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  type="password"
-                  value={field.state.value}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p className="text-red-500" key={error?.message}>
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
-
-        <form.Subscribe>
-          {(state) => (
-            <Button
-              className="w-full"
-              disabled={!state.canSubmit || state.isSubmitting}
-              type="submit"
+    <Card className="mt-8 flex flex-col gap-6 p-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <FieldGroup>
+          <CardHeader className="flex flex-col items-center gap-2 text-center">
+            <a
+              className="flex flex-col items-center gap-2 font-medium"
+              href="/"
             >
-              {state.isSubmitting ? "Submitting..." : "Sign Up"}
-            </Button>
-          )}
-        </form.Subscribe>
+              <div className="flex size-8 items-center justify-center rounded-md">
+                <GalleryVerticalEnd className="size-6" />
+              </div>
+              <span className="sr-only">Acme Inc.</span>
+            </a>
+            <h1 className="font-bold text-xl">
+              Create an account for the best holiday deals
+            </h1>
+            <FieldDescription>
+              Already have an account?{" "}
+              <button
+                className="underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onSwitchToSignIn();
+                }}
+                type="button"
+              >
+                Sign in
+              </button>
+            </FieldDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Field>
+              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <Input
+                id="name"
+                placeholder="Enter your name"
+                required
+                type="text"
+                {...form.register("name")}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                id="email"
+                placeholder="m@example.com"
+                required
+                type="email"
+                {...form.register("email")}
+              />
+              <FieldError
+                errors={
+                  form.formState.errors.email
+                    ? [{ message: form.formState.errors.email.message }]
+                    : undefined
+                }
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input
+                id="password"
+                placeholder="Enter your password"
+                required
+                type="password"
+                {...form.register("password")}
+              />
+              <FieldError
+                errors={
+                  form.formState.errors.password
+                    ? [{ message: form.formState.errors.password.message }]
+                    : undefined
+                }
+              />
+            </Field>
+            <Field>
+              <Button disabled={form.formState.isSubmitting} type="submit">
+                {form.formState.isSubmitting ? "Signing in..." : "Login"}
+              </Button>
+            </Field>
+            <FieldSeparator className="my-4">Or</FieldSeparator>
+            <FieldDescription className="text-center">
+              Continue with
+            </FieldDescription>
+            <SocialLoginButtons />
+          </CardContent>
+          <CardFooter>
+            <FieldDescription className="text-center">
+              By clicking continue, you agree to our{" "}
+              <a href="/terms">Terms of Service</a> and{" "}
+              <a href="/privacy">Privacy Policy</a>.
+            </FieldDescription>
+          </CardFooter>
+        </FieldGroup>
       </form>
-
-      <div className="mt-4 text-center">
-        <Button
-          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-200 dark:hover:text-indigo-400"
-          onClick={onSwitchToSignIn}
-          variant="link"
-        >
-          Already have an account? Sign In
-        </Button>
-      </div>
-    </div>
+    </Card>
   );
 }

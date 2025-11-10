@@ -12,7 +12,7 @@ export default function LoginPage() {
       <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
     </div>
   ) : (
-    <div className="flex flex-col items-center">
+    <div className="mx-auto mt-40 max-w-md">
       <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
     </div>
   );
