@@ -64,11 +64,6 @@ export default function UserMenu() {
             {roleLink.label}
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/todos" onClick={closeMobileMenu}>
-            Todos
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Button

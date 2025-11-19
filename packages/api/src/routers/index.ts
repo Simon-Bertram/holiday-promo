@@ -1,6 +1,5 @@
 import type { RouterClient } from "@orpc/server";
 import { protectedProcedure, publicProcedure } from "../index";
-import { todoRouter } from "./todo";
 import { userRouter } from "./user";
 
 export const appRouter = {
@@ -12,7 +11,6 @@ export const appRouter = {
       user: context.session?.user,
     };
   }),
-  todo: todoRouter,
   user: userRouter,
 };
 export type AppRouter = typeof appRouter;

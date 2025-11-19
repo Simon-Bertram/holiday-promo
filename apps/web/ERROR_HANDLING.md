@@ -42,7 +42,6 @@ Error boundaries are React components that catch JavaScript errors in their chil
 ### Route-specific Error Boundaries
 
 - **Dashboard**: `apps/web/src/app/dashboard/error.tsx`
-- **Todos**: `apps/web/src/app/todos/error.tsx`
 - **Login**: `apps/web/src/app/login/error.tsx`
 
 These catch errors in specific routes and provide contextual error messages.
@@ -109,34 +108,6 @@ async function handleRequest(req: NextRequest) {
 ### Error Handling in Procedures
 
 Following Next.js best practices, we **avoid try/catch for expected errors** and instead handle them explicitly. Unexpected errors (bugs) bubble up to error boundaries automatically.
-
-**Example from todo router**:
-
-```typescript
-export const todoRouter = {
-  getAll: publicProcedure.handler(async () => {
-    // Let database errors bubble up to error boundary
-    return await db.select().from(todo);
-  }),
-
-  toggle: publicProcedure.handler(async ({ input }) => {
-    const result = await db
-      .update(todo)
-      .set({ completed: input.completed })
-      .where(eq(todo.id, input.id))
-      .returning();
-
-    // Handle expected error - resource not found
-    if (result.length === 0) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Todo not found",
-      });
-    }
-
-    return result[0];
-  }),
-};
-```
 
 **Key principle**: Throw `ORPCError` for expected errors (UNAUTHORIZED, NOT_FOUND), let unexpected errors (database failures, bugs) bubble up to be caught by error boundaries.
 
@@ -254,24 +225,6 @@ if (privateData.isError) {
     </div>
   );
 }
-```
-
-### Mutation Error Handling
-
-Mutations include onError callbacks:
-
-```typescript
-const createMutation = useMutation(
-  orpc.todo.create.mutationOptions({
-    onSuccess: () => {
-      todos.refetch();
-      setNewTodoText("");
-    },
-    onError: (error) => {
-      console.error("Error creating todo:", error);
-    },
-  })
-);
 ```
 
 ## Context Creation Error Handling
@@ -436,7 +389,6 @@ To test error handling:
 - Not Found: `apps/web/src/app/not-found.tsx`
 - Login Error: `apps/web/src/app/login/error.tsx`
 - API Routes: `apps/web/src/app/api/rpc/[[...rest]]/route.ts`
-- Todo Router: `packages/api/src/routers/todo.ts`
 - Context: `packages/api/src/context.ts`
 - Middleware: `packages/api/src/index.ts`
 - Query Client: `apps/web/src/utils/orpc.ts`

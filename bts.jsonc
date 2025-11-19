@@ -16,9 +16,7 @@
     "turborepo",
     "ultracite"
   ],
-  "examples": [
-    "todo"
-  ],
+  "examples": [],
   "auth": "better-auth",
   "packageManager": "bun",
   "dbSetup": "neon",

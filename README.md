@@ -50,11 +50,10 @@ Below is a summary of the major API endpoints, routers, and handlers:
 
 ### ORPC Routers (`packages/api/src/routers`)
 
-- **`appRouter`**: Root router, combines all features (e.g. `healthCheck`, `privateData`, `todo`).
+- **`appRouter`**: Root router combining core features (e.g. `healthCheck`, `privateData`, `user`).
   - **`healthCheck`**: Simple public procedure returns 'OK' (for monitoring/tests).
   - **`privateData`**: Protected route, returns user info; requires auth.
-  - **`todo`**: Mounts the todo CRUD operations below.
-- **`todoRouter`**: Typed endpoints for todo CRUD features (getAll, create, toggle, delete). Each endpoint auto-validates input with Zod and applies business logic.
+  - **`user`**: User-specific procedures (e.g., `me`, `list`).
 
 ### Middleware & Context
 
