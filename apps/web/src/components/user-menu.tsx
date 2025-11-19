@@ -13,6 +13,16 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
+type SessionData = ReturnType<typeof authClient.useSession>["data"];
+type SessionUser = NonNullable<SessionData> extends { user: infer U }
+  ? U
+  : never;
+
+const hasRole = (
+  user: SessionUser | undefined
+): user is SessionUser & { role: "admin" | "user" } =>
+  Boolean(user && typeof (user as { role?: unknown }).role === "string");
+
 export default function UserMenu() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
@@ -32,8 +42,11 @@ export default function UserMenu() {
     );
   }
 
-  const roleLink =
-    session.user.role === "admin"
+  const roleLink: {
+    href: "/dashboard" | "/profile";
+    label: "Dashboard" | "My Profile";
+  } =
+    hasRole(session.user) && session.user.role === "admin"
       ? { href: "/dashboard", label: "Dashboard" }
       : { href: "/profile", label: "My Profile" };
 

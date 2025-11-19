@@ -16,6 +16,16 @@ type NavItemsProps = {
   onItemClick?: () => void;
 };
 
+type SessionData = ReturnType<typeof authClient.useSession>["data"];
+type SessionUser = NonNullable<SessionData> extends { user: infer U }
+  ? U
+  : never;
+
+const hasRole = (
+  user: SessionUser | undefined
+): user is SessionUser & { role: "admin" | "user" } =>
+  Boolean(user && typeof (user as { role?: unknown }).role === "string");
+
 export default function NavItems({ className, onItemClick }: NavItemsProps) {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
@@ -31,7 +41,7 @@ export default function NavItems({ className, onItemClick }: NavItemsProps) {
     }
 
     const roleItem: NavItem =
-      session.user.role === "admin"
+      hasRole(session.user) && session.user.role === "admin"
         ? { href: "/dashboard", label: "Dashboard" }
         : { href: "/profile", label: "Profile" };
 

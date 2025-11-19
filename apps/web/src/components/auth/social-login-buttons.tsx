@@ -33,12 +33,20 @@ export function SocialLoginButtons() {
   const { signIn: signInWithGoogle, isLoading: isGoogleLoading } =
     useGoogleSignIn();
 
-  const handleMetaLogin = () => {
-    void signInWithFacebook();
+  const handleMetaLogin = async () => {
+    try {
+      await signInWithFacebook();
+    } catch (err) {
+      console.error("Failed to sign in with Meta", err);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    void signInWithGoogle();
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      console.error("Failed to sign in with Google", err);
+    }
   };
 
   return (
