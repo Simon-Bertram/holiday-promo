@@ -11,16 +11,12 @@ const requireAuth = o.middleware(async ({ context, next }) => {
       message: "You must be logged in to access this resource",
     });
   }
-  try {
-    return await next({
-      context: {
-        session: context.session,
-      },
-    });
-  } catch (error) {
-    console.error("Error in requireAuth middleware:", error);
-    throw error;
-  }
+  // Let errors bubble up to error interceptor for logging
+  return await next({
+    context: {
+      session: context.session,
+    },
+  });
 });
 
 export const protectedProcedure = publicProcedure.use(requireAuth);

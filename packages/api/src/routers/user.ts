@@ -15,8 +15,12 @@ const defaultUserSelect = {
 
 export const userRouter = {
   me: protectedProcedure.handler(({ context }) => {
+    // Session is guaranteed to exist by protectedProcedure middleware
+    // This check is redundant but kept as a safety guard
     if (!context.session?.user) {
-      throw new Error("Session user is missing");
+      throw new ORPCError("UNAUTHORIZED", {
+        message: "You must be logged in to access this resource",
+      });
     }
     return {
       id: context.session.user.id,
@@ -37,18 +41,12 @@ export const userRouter = {
 
     const userId = context.session.user.id;
 
-    try {
-      await db.delete(user).where(eq(user.id, userId));
+    // Let database errors bubble up - they'll be caught by error interceptor
+    await db.delete(user).where(eq(user.id, userId));
 
-      return {
-        success: true,
-        message: "Account deleted successfully",
-      };
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
-        message: "Failed to delete account",
-      });
-    }
+    return {
+      success: true,
+      message: "Account deleted successfully",
+    };
   }),
 };
