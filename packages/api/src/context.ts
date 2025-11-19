@@ -1,6 +1,7 @@
 import { auth } from "@holiday-promo/auth";
 import type { user as userTable } from "@holiday-promo/db/schema/auth";
 import type { NextRequest } from "next/server";
+import { logError } from "./utils/logger";
 
 // Type representing the session returned from auth.api.getSession
 type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
@@ -34,7 +35,17 @@ export async function createContext(req: NextRequest): Promise<Context> {
     };
   } catch (error) {
     // If session retrieval fails, log the error and return null session
-    console.error("Error creating context:", error);
+    // Sanitize error to prevent sensitive data leakage
+    logError(error, {
+      type: "CONTEXT",
+      path: req.url,
+      method: req.method,
+      userAgent: req.headers.get("user-agent") || undefined,
+      ipAddress:
+        req.headers.get("x-forwarded-for") ||
+        req.headers.get("x-real-ip") ||
+        undefined,
+    });
     return {
       session: null,
     };
