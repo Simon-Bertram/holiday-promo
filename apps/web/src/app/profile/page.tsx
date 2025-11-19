@@ -1,6 +1,23 @@
 import { auth } from "@holiday-promo/auth";
+import type { user as userTable } from "@holiday-promo/db/schema/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
+type NonNullAuthSession = Exclude<AuthSession, null>;
+
+// Runtime type guard to verify role exists and is valid
+function hasRole(
+  user: NonNullAuthSession["user"]
+): user is NonNullAuthSession["user"] & {
+  role: (typeof userTable.$inferSelect)["role"];
+} {
+  return (
+    "role" in user &&
+    typeof user.role === "string" &&
+    (user.role === "subscriber" || user.role === "admin")
+  );
+}
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -11,7 +28,16 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  if (session.user.role === "admin") {
+  // Runtime validation: ensure role exists and is valid
+  if (!hasRole(session.user)) {
+    console.error("Session user missing valid role field");
+    redirect("/login");
+  }
+
+  // TypeScript now knows session.user has role, but we've also verified it at runtime
+  const userWithRole = session.user;
+
+  if (userWithRole.role === "admin") {
     redirect("/dashboard");
   }
 
@@ -29,19 +55,19 @@ export default async function ProfilePage() {
           <div>
             <dt className="font-medium text-muted-foreground text-sm">Name</dt>
             <dd className="mt-1 font-semibold text-base">
-              {session.user.name}
+              {userWithRole.name}
             </dd>
           </div>
           <div>
             <dt className="font-medium text-muted-foreground text-sm">Email</dt>
             <dd className="mt-1 font-semibold text-base">
-              {session.user.email}
+              {userWithRole.email}
             </dd>
           </div>
           <div>
             <dt className="font-medium text-muted-foreground text-sm">Role</dt>
             <dd className="mt-1 font-semibold text-base capitalize">
-              {session.user.role}
+              {userWithRole.role}
             </dd>
           </div>
           <div>
@@ -49,8 +75,8 @@ export default async function ProfilePage() {
               Member since
             </dt>
             <dd className="mt-1 font-semibold text-base">
-              {session.user.createdAt
-                ? new Date(session.user.createdAt).toLocaleDateString()
+              {userWithRole.createdAt
+                ? new Date(userWithRole.createdAt).toLocaleDateString()
                 : "—"}
             </dd>
           </div>
