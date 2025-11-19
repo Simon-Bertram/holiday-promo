@@ -32,6 +32,11 @@ export default function UserMenu() {
     );
   }
 
+  const roleLink =
+    session.user.role === "admin"
+      ? { href: "/dashboard", label: "Dashboard" }
+      : { href: "/profile", label: "My Profile" };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,12 +47,24 @@ export default function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
         <DropdownMenuItem asChild>
+          <Link href={roleLink.href} onClick={closeMobileMenu}>
+            {roleLink.label}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/todos" onClick={closeMobileMenu}>
+            Todos
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
           <Button
             className="w-full"
             onClick={() => {
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
+                    closeMobileMenu();
                     router.push("/");
                   },
                 },
