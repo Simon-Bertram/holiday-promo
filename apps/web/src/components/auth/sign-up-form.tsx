@@ -4,10 +4,9 @@ import { useForm } from "react-hook-form";
 import { useSignUp } from "@/hooks/use-sign-up";
 import { authClient } from "@/lib/auth-client";
 import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth";
-import { SocialLoginButtons } from "./auth/social-login-buttons";
-import Loader from "./loader";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import Loader from "../loader";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import {
   Field,
   FieldDescription,
@@ -15,8 +14,9 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "./ui/field";
-import { Input } from "./ui/input";
+} from "../ui/field";
+import { Input } from "../ui/input";
+import { SocialLoginButtons } from "./social-login-buttons";
 
 export default function SignInForm({
   onSwitchToSignIn,

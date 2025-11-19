@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { useFacebookSignIn } from "@/hooks/use-facebook-sign-in";
+import { useGoogleSignIn } from "@/hooks/use-google-sign-in";
 
 function MetaIcon() {
   return (
@@ -26,26 +28,39 @@ function GoogleIcon() {
 }
 
 export function SocialLoginButtons() {
+  const { signIn: signInWithFacebook, isLoading: isFacebookLoading } =
+    useFacebookSignIn();
+  const { signIn: signInWithGoogle, isLoading: isGoogleLoading } =
+    useGoogleSignIn();
+
   const handleMetaLogin = () => {
-    // TODO: Implement Meta OAuth
-    console.log("Meta login not implemented");
+    void signInWithFacebook();
   };
 
   const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth
-    console.log("Google login not implemented");
+    void signInWithGoogle();
   };
 
   return (
     <Field className="grid gap-4 sm:grid-cols-2">
-      <Button onClick={handleMetaLogin} type="button" variant="outline">
+      <Button
+        disabled={isFacebookLoading || isGoogleLoading}
+        onClick={handleMetaLogin}
+        type="button"
+        variant="outline"
+      >
         <MetaIcon />
-        Meta
+        {isFacebookLoading ? "Loading..." : "Meta"}
         <span className="sr-only">Login with Meta</span>
       </Button>
-      <Button onClick={handleGoogleLogin} type="button" variant="outline">
+      <Button
+        disabled={isFacebookLoading || isGoogleLoading}
+        onClick={handleGoogleLogin}
+        type="button"
+        variant="outline"
+      >
         <GoogleIcon />
-        Google
+        {isGoogleLoading ? "Loading..." : "Google"}
         <span className="sr-only">Login with Google</span>
       </Button>
     </Field>
