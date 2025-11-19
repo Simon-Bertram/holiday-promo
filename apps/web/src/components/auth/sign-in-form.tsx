@@ -1,13 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useSignIn } from "@/hooks/use-sign-in";
-import { authClient } from "@/lib/auth-client";
-import { type SignInFormData, signInSchema } from "@/lib/validations/auth";
-import { SocialLoginButtons } from "./auth/social-login-buttons";
-import Loader from "./loader";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
+import Loader from "@/components/loader";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -15,8 +17,11 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "./ui/field";
-import { Input } from "./ui/input";
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useSignIn } from "@/hooks/use-sign-in";
+import { authClient } from "@/lib/auth-client";
+import { type SignInFormData, signInSchema } from "@/lib/validations/auth";
 
 export default function SignInForm({
   onSwitchToSignUp,
