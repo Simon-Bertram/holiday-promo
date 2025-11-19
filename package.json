@@ -33,6 +33,7 @@
     "db:migrate": "turbo -F @holiday-promo/db db:migrate"
   },
   "dependencies": {
+    "drizzle-orm": "^0.44.7",
     "dotenv": "^17.2.3",
     "zod": "^4.1.12",
     "next": "16.0.1",
