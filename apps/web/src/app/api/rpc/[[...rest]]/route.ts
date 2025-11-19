@@ -1,3 +1,4 @@
+// Handles RPC calls plus OpenAPI reference generation for the /api/rpc route
 import { createContext } from "@holiday-promo/api/context";
 import { appRouter } from "@holiday-promo/api/routers/index";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
@@ -51,6 +52,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
   ],
 });
 
+// Sequentially try RPC responses before falling back to OpenAPI docs
 async function handleRequest(req: NextRequest) {
   try {
     const context = await createContext(req);

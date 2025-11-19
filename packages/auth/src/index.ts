@@ -28,5 +28,15 @@ export const auth = betterAuth<BetterAuthOptions>({
       },
     },
   },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+    facebook: {
+      clientId: process.env.META_CLIENT_ID || "",
+      clientSecret: process.env.META_CLIENT_SECRET || "",
+    },
+  },
   plugins: [nextCookies()],
 });
