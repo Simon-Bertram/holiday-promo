@@ -2,6 +2,7 @@ import { auth } from "@holiday-promo/auth";
 import type { user as userTable } from "@holiday-promo/db/schema/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { DeleteAccountButton } from "@/components/delete-account-button";
 
 type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
 type NonNullAuthSession = Exclude<AuthSession, null>;
@@ -78,6 +79,14 @@ export default async function ProfilePage() {
               {userWithRole.createdAt
                 ? new Date(userWithRole.createdAt).toLocaleDateString()
                 : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="font-medium text-muted-foreground text-sm">
+              Danger Zone
+            </dt>
+            <dd className="mt-1 font-semibold text-base capitalize">
+              <DeleteAccountButton />
             </dd>
           </div>
         </dl>

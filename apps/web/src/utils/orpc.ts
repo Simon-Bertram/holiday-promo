@@ -5,6 +5,11 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+/**
+ * React Query client with global error handling.
+ * Automatically shows toast notifications for any query errors
+ * and provides a retry action to invalidate all queries.
+ */
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
@@ -20,6 +25,12 @@ export const queryClient = new QueryClient({
   }),
 });
 
+/**
+ * RPC link configuration for making API calls.
+ * - Sets the API endpoint URL (client-side uses window.location.origin, server-side uses localhost)
+ * - Ensures credentials (cookies) are included in requests for authentication
+ * - Handles headers differently for client vs server-side rendering
+ */
 export const link = new RPCLink({
   url: `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3001"}/api/rpc`,
   fetch(url, options) {
@@ -38,6 +49,14 @@ export const link = new RPCLink({
   },
 });
 
+/**
+ * ORPC client instance for calling API procedures.
+ * Use this for direct procedure calls (e.g., client.user.delete()).
+ */
 export const client: AppRouterClient = createORPCClient(link);
 
+/**
+ * TanStack Query utilities for ORPC client.
+ * Use this for React Query hooks (e.g., orpc.user.list.useQuery()).
+ */
 export const orpc = createTanstackQueryUtils(client);
