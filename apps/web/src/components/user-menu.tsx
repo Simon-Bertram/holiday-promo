@@ -36,7 +36,7 @@ export default function UserMenu() {
     return (
       <Button asChild>
         <Link href="/login" onClick={closeMobileMenu}>
-          Sign In
+          Sign Up
         </Link>
       </Button>
     );

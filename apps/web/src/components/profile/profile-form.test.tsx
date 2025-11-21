@@ -69,6 +69,7 @@ describe("ProfileForm", () => {
     mockedRouter.mockReturnValue({ refresh: refreshMock } as never);
   });
 
+  // Confirms the happy path updates data, shows success toast, and refreshes
   it("submits updates and shows success feedback", async () => {
     mockedUpdateProfile.mockResolvedValueOnce({
       id: "user_123",
@@ -118,6 +119,7 @@ describe("ProfileForm", () => {
     });
   });
 
+  // Ensures server errors bubble up, display to the user, and preserve input
   it("surfaces server errors and keeps latest input", async () => {
     mockedUpdateProfile.mockRejectedValueOnce(new Error("Network failure"));
 

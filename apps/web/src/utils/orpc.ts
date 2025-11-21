@@ -39,13 +39,14 @@ export const link = new RPCLink({
       credentials: "include",
     });
   },
-  headers: async () => {
+  headers: () => {
     if (typeof window !== "undefined") {
-      return {};
+      return Promise.resolve({});
     }
 
-    const { headers } = await import("next/headers");
-    return Object.fromEntries(await headers());
+    return import("next/headers").then(({ headers }) =>
+      headers().then((h) => Object.fromEntries(h))
+    );
   },
 });
 

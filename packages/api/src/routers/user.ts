@@ -3,6 +3,7 @@ import { user } from "@holiday-promo/db/schema/auth";
 import { ORPCError } from "@orpc/server";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { adminProcedure, protectedProcedure } from "../index";
+import { deleteUserById } from "../services/delete-user";
 import {
   type UpdateProfileInput,
   updateProfileInputSchema,
@@ -45,8 +46,7 @@ export const userRouter = {
 
     const userId = context.session.user.id;
 
-    // Let database errors bubble up - they'll be caught by error interceptor
-    await db.delete(user).where(eq(user.id, userId));
+    await deleteUserById(userId);
 
     return {
       success: true,

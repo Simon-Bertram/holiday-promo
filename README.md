@@ -47,6 +47,7 @@ Below is a summary of the major API endpoints, routers, and handlers:
     - Injects context (auth session) into each procedure call.
     - All HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) supported.
 - **`/api/auth/[...all]`**: Authentication endpoints (sessions, signin, signout, etc.) handled by Better Auth handler.
+- **`/api/facebook/data-deletion`**: Facebook data deletion callback that validates `signed_request`, deletes the mapped Better Auth user via `deleteUserById`, and responds with a confirmation URL for Facebook polling.
 
 ### ORPC Routers (`packages/api/src/routers`)
 
@@ -112,3 +113,18 @@ holiday-promo/
 - `bun check-types`: Check TypeScript types across all apps
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
+
+## Facebook Data Deletion Callback
+
+To comply with Facebook's data deletion requirements you must configure:
+
+- `FACEBOOK_APP_SECRET`: The app secret used to verify `signed_request`.
+- `FACEBOOK_DELETION_STATUS_URL`: Absolute URL that Facebook can poll (e.g., `https://your-domain.com/facebook-deletion-status`).
+
+When Facebook calls `/api/facebook/data-deletion`, the server validates the signature, deletes the associated Better Auth user (if one exists), and responds with:
+
+```json
+{
+  "url": "https://your-domain.com/facebook-deletion-status?confirmation_code=..."
+}
+```
