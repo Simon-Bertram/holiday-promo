@@ -1,8 +1,12 @@
 import { db } from "@holiday-promo/db";
 import { user } from "@holiday-promo/db/schema/auth";
 import { ORPCError } from "@orpc/server";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { adminProcedure, protectedProcedure } from "../index";
+import {
+  type UpdateProfileInput,
+  updateProfileInputSchema,
+} from "./user/update-profile.schema";
 
 const defaultUserSelect = {
   id: user.id,
@@ -49,4 +53,57 @@ export const userRouter = {
       message: "Account deleted successfully",
     };
   }),
+  updateProfile: protectedProcedure
+    .input(updateProfileInputSchema)
+    .handler(async ({ context, input }) => {
+      if (!context.session?.user) {
+        throw new ORPCError("UNAUTHORIZED", {
+          message: "You must be logged in to update your profile",
+        });
+      }
+
+      const sessionUser = context.session.user;
+
+      if (sessionUser.role !== "subscriber") {
+        throw new ORPCError("FORBIDDEN", {
+          message: "Only subscribers can update their profiles",
+        });
+      }
+
+      const updateInput: UpdateProfileInput = input;
+
+      if (updateInput.email !== sessionUser.email) {
+        const [existingUser] = await db
+          .select({ id: user.id })
+          .from(user)
+          .where(
+            and(eq(user.email, updateInput.email), ne(user.id, sessionUser.id))
+          )
+          .limit(1);
+
+        if (existingUser) {
+          throw new ORPCError("CONFLICT", {
+            message: "That email address is already in use",
+          });
+        }
+      }
+
+      const [updatedUser] = await db
+        .update(user)
+        .set({
+          name: updateInput.name,
+          email: updateInput.email,
+          updatedAt: new Date(),
+        })
+        .where(eq(user.id, sessionUser.id))
+        .returning(defaultUserSelect);
+
+      if (!updatedUser) {
+        throw new ORPCError("NOT_FOUND", {
+          message: "Unable to update profile",
+        });
+      }
+
+      return updatedUser;
+    }),
 };
