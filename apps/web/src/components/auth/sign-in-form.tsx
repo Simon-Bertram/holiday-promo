@@ -113,7 +113,7 @@ export default function SignInForm({
             </Field>
             <Field>
               <Button disabled={form.formState.isSubmitting} type="submit">
-                {form.formState.isSubmitting ? "Signing in..." : "Login"}
+                {form.formState.isSubmitting ? 'loading' : 'Login'}
               </Button>
             </Field>
             <FieldSeparator className="my-4">Or</FieldSeparator>
