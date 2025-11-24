@@ -1,8 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GalleryVerticalEnd } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import Loader from "@/components/loader";
+import TurnstileWidget from "@/components/turnstile-widget";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +32,7 @@ export default function SignInForm({
 }) {
   const { isPending } = authClient.useSession();
   const { signUp } = useSignUp();
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -37,10 +40,27 @@ export default function SignInForm({
       name: "",
       email: "",
       password: "",
+      turnstileToken: "",
     },
   });
 
+  const handleTurnstileSuccess = (token: string) => {
+    setTurnstileToken(token);
+    form.setValue("turnstileToken", token, { shouldValidate: true });
+  };
+
+  const handleTurnstileError = () => {
+    setTurnstileToken("");
+    form.setValue("turnstileToken", "", { shouldValidate: true });
+  };
+
   const handleSubmit = async (data: SignUpFormData) => {
+    if (!turnstileToken) {
+      form.setError("turnstileToken", {
+        message: "Please complete the verification",
+      });
+      return;
+    }
     await signUp(data);
   };
 
@@ -125,8 +145,25 @@ export default function SignInForm({
               />
             </Field>
             <Field>
+              <TurnstileWidget
+                onError={handleTurnstileError}
+                onSuccess={handleTurnstileSuccess}
+              />
+              <FieldError
+                errors={
+                  form.formState.errors.turnstileToken
+                    ? [
+                        {
+                          message: form.formState.errors.turnstileToken.message,
+                        },
+                      ]
+                    : undefined
+                }
+              />
+            </Field>
+            <Field>
               <Button disabled={form.formState.isSubmitting} type="submit">
-                {form.formState.isSubmitting ? 'loading' : 'Sign Up'}
+                {form.formState.isSubmitting ? "loading" : "Sign Up"}
               </Button>
             </Field>
             <FieldSeparator className="my-4">Or</FieldSeparator>

@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth-client";
+import { authClient, setTurnstileToken } from "@/lib/auth-client";
 import { logAuthError, normalizeAuthError } from "@/lib/errors/auth-errors";
 import type { SignInFormData } from "@/lib/validations/auth";
 
@@ -21,6 +21,9 @@ export function useSignIn(): UseSignInResult {
 
   const signIn = async (data: SignInFormData): Promise<void> => {
     try {
+      // Set Turnstile token for the next auth request
+      setTurnstileToken(data.turnstileToken);
+
       await authClient.signIn.email(
         {
           email: data.email,
@@ -58,6 +61,9 @@ export function useSignIn(): UseSignInResult {
       toast.error(normalizedError.message, {
         duration: 5000,
       });
+    } finally {
+      // Clear token after use
+      setTurnstileToken(null);
     }
   };
 

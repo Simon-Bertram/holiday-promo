@@ -46,7 +46,7 @@ Below is a summary of the major API endpoints, routers, and handlers:
     - OpenAPI (API reference/docs) via `OpenAPIHandler`.
     - Injects context (auth session) into each procedure call.
     - All HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) supported.
-- **`/api/auth/[...all]`**: Authentication endpoints (sessions, signin, signout, etc.) handled by Better Auth handler.
+- **`/api/auth/[...all]`**: Authentication endpoints (sessions, signin, signout, etc.) handled by Better Auth handler. Includes Turnstile token validation for sign-in and sign-up requests.
 - **`/api/facebook/data-deletion`**: Facebook data deletion callback that validates `signed_request`, deletes the mapped Better Auth user via `deleteUserById`, and responds with a confirmation URL for Facebook polling.
 
 ### ORPC Routers (`packages/api/src/routers`)
@@ -113,6 +113,22 @@ holiday-promo/
 - `bun check-types`: Check TypeScript types across all apps
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
+
+## Cloudflare Turnstile Integration
+
+This project includes Cloudflare Turnstile CAPTCHA protection for sign-in and sign-up forms. Turnstile provides privacy-first bot protection without requiring user interaction in most cases.
+
+**Configuration Required:**
+- `TURNSTILE_SECRET_KEY`: Server-side secret key for token validation
+- `development.TURNSTILE_SITEKEY` or `NEXT_PUBLIC_TURNSTILE_SITEKEY`: Client-side site key
+
+**Features:**
+- Automatic token generation on form load
+- Server-side validation before authentication
+- Single-use tokens with 5-minute expiration
+- IP address validation for enhanced security
+
+For detailed documentation, see [TURNSTILE_INTEGRATION.md](./TURNSTILE_INTEGRATION.md).
 
 ## Facebook Data Deletion Callback
 

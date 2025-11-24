@@ -15,6 +15,7 @@ export const signInSchema = z.object({
       MAX_PASSWORD_LENGTH,
       `Password must be less than ${MAX_PASSWORD_LENGTH} characters`
     ),
+  turnstileToken: z.string().min(1, "Turnstile verification is required"),
 });
 
 export const signUpSchema = z.object({
@@ -30,6 +31,7 @@ export const signUpSchema = z.object({
       MAX_PASSWORD_LENGTH,
       `Password must be less than ${MAX_PASSWORD_LENGTH} characters`
     ),
+  turnstileToken: z.string().min(1, "Turnstile verification is required"),
 });
 
 export type SignInFormData = z.infer<typeof signInSchema>;
