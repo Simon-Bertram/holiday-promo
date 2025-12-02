@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import {
   Card,
@@ -324,17 +325,14 @@ export default function PrivacyPolicyPage() {
               Privacy Policy or our data practices, please contact us at:
             </p>
             <div className="mt-4 rounded-lg bg-muted p-4">
-              <p className="font-medium">Email:</p>
-              <p className="text-muted-foreground">
-                [Your contact email address]
-              </p>
-              <p className="mt-4 font-medium">Address:</p>
-              <p className="text-muted-foreground">[Your business address]</p>
+              <Link
+                className="text-primary hover:underline"
+                href="/contact"
+                prefetch
+              >
+                Contact Us
+              </Link>
             </div>
-            <p className="mt-4 text-muted-foreground text-sm italic">
-              Note: Please replace the placeholder contact information above
-              with your actual contact details before publishing.
-            </p>
           </CollapsibleSection>
 
           <Separator />

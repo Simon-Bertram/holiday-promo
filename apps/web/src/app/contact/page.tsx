@@ -6,8 +6,8 @@ export default function ContactPage() {
       <header className="space-y-2">
         <h1 className="font-bold text-3xl">Contact Us</h1>
         <p className="text-muted-foreground">
-          Have a question or feedback? We'd love to hear from you. Fill out the
-          form below and we'll get back to you as soon as possible.
+          Have a question or feedback? We&apos;d love to hear from you. Fill out
+          the form below and we&apos;ll get back to you as soon as possible.
         </p>
       </header>
 
