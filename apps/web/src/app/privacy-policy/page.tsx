@@ -1,4 +1,7 @@
-import type { Metadata } from "next";
+"use client";
+
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -6,16 +9,48 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "Privacy Policy for holiday-promo",
+type CollapsibleSectionProps = {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
 };
+
+function CollapsibleSection({
+  title,
+  children,
+  defaultOpen = false,
+}: CollapsibleSectionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <Collapsible onOpenChange={setIsOpen} open={isOpen}>
+      <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-left">
+        <h2 className="font-semibold text-2xl">{title}</h2>
+        <ChevronDown
+          className={cn(
+            "size-5 text-muted-foreground transition-transform duration-200",
+            isOpen && "rotate-180"
+          )}
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-4 space-y-4">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-12">
+    <div className="container mx-auto mt-24 max-w-4xl px-4 py-12">
       <Card>
         <CardHeader>
           <CardTitle className="text-3xl">Privacy Policy</CardTitle>
@@ -43,10 +78,7 @@ export default function PrivacyPolicyPage() {
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              2. Information We Collect
-            </h2>
+          <CollapsibleSection title="2. Information We Collect">
             <p className="mb-4 text-muted-foreground leading-relaxed">
               We collect information that you provide directly to us and
               information that is automatically collected when you use our
@@ -91,14 +123,11 @@ export default function PrivacyPolicyPage() {
                 to verify legitimate users.
               </li>
             </ul>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              3. How We Use Your Information
-            </h2>
+          <CollapsibleSection title="3. How We Use Your Information">
             <p className="mb-4 text-muted-foreground leading-relaxed">
               We use the information we collect for the following purposes:
             </p>
@@ -117,14 +146,11 @@ export default function PrivacyPolicyPage() {
                 To personalize your experience and provide relevant content
               </li>
             </ul>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              4. Social Authentication
-            </h2>
+          <CollapsibleSection title="4. Social Authentication">
             <p className="mb-4 text-muted-foreground leading-relaxed">
               We offer social authentication through Facebook and Google. When
               you choose to sign in using these providers:
@@ -147,14 +173,11 @@ export default function PrivacyPolicyPage() {
                 policies of Facebook and Google
               </li>
             </ul>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              5. Data Sharing and Disclosure
-            </h2>
+          <CollapsibleSection title="5. Data Sharing and Disclosure">
             <p className="mb-4 text-muted-foreground leading-relaxed">
               We do not sell, trade, or rent your personal information to third
               parties. We may share your information only in the following
@@ -180,12 +203,11 @@ export default function PrivacyPolicyPage() {
                 with your explicit consent
               </li>
             </ul>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">6. Data Security</h2>
+          <CollapsibleSection title="6. Data Security">
             <p className="text-muted-foreground leading-relaxed">
               We implement appropriate technical and organizational security
               measures to protect your personal information against unauthorized
@@ -195,14 +217,11 @@ export default function PrivacyPolicyPage() {
               Internet or electronic storage is 100% secure, and we cannot
               guarantee absolute security.
             </p>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              7. Your Rights and Choices
-            </h2>
+          <CollapsibleSection title="7. Your Rights and Choices">
             <p className="mb-4 text-muted-foreground leading-relaxed">
               You have the following rights regarding your personal information:
             </p>
@@ -245,12 +264,11 @@ export default function PrivacyPolicyPage() {
                 status of your deletion request
               </li>
             </ul>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">8. Data Retention</h2>
+          <CollapsibleSection title="8. Data Retention">
             <p className="text-muted-foreground leading-relaxed">
               We retain your personal information for as long as necessary to
               provide our services and fulfill the purposes outlined in this
@@ -259,14 +277,11 @@ export default function PrivacyPolicyPage() {
               anonymize your personal information, except where we are required
               to retain it for legal or legitimate business purposes.
             </p>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              9. Children&apos;s Privacy
-            </h2>
+          <CollapsibleSection title="9. Children&apos;s Privacy">
             <p className="text-muted-foreground leading-relaxed">
               Our service is not intended for children under the age of 13. We
               do not knowingly collect personal information from children under
@@ -274,14 +289,11 @@ export default function PrivacyPolicyPage() {
               provided us with personal information, please contact us
               immediately, and we will delete such information from our records.
             </p>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              10. International Data Transfers
-            </h2>
+          <CollapsibleSection title="10. International Data Transfers">
             <p className="text-muted-foreground leading-relaxed">
               Your information may be transferred to and processed in countries
               other than your country of residence. These countries may have
@@ -289,14 +301,11 @@ export default function PrivacyPolicyPage() {
               using our service, you consent to the transfer of your information
               to these countries.
             </p>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              11. Changes to This Privacy Policy
-            </h2>
+          <CollapsibleSection title="11. Changes to This Privacy Policy">
             <p className="text-muted-foreground leading-relaxed">
               We may update this Privacy Policy from time to time to reflect
               changes in our practices or for other operational, legal, or
@@ -305,12 +314,11 @@ export default function PrivacyPolicyPage() {
               &quot;Last updated&quot; date. You are advised to review this
               Privacy Policy periodically for any changes.
             </p>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">12. Contact Us</h2>
+          <CollapsibleSection title="12. Contact Us">
             <p className="text-muted-foreground leading-relaxed">
               If you have any questions, concerns, or requests regarding this
               Privacy Policy or our data practices, please contact us at:
@@ -327,14 +335,11 @@ export default function PrivacyPolicyPage() {
               Note: Please replace the placeholder contact information above
               with your actual contact details before publishing.
             </p>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              13. California Privacy Rights
-            </h2>
+          <CollapsibleSection title="13. California Privacy Rights">
             <p className="text-muted-foreground leading-relaxed">
               If you are a California resident, you have additional rights under
               the California Consumer Privacy Act (CCPA), including:
@@ -357,14 +362,11 @@ export default function PrivacyPolicyPage() {
                 rights
               </li>
             </ul>
-          </section>
+          </CollapsibleSection>
 
           <Separator />
 
-          <section>
-            <h2 className="mb-4 font-semibold text-2xl">
-              14. GDPR Rights (European Users)
-            </h2>
+          <CollapsibleSection title="14. GDPR Rights (European Users)">
             <p className="text-muted-foreground leading-relaxed">
               If you are located in the European Economic Area (EEA), you have
               certain data protection rights under the General Data Protection
@@ -379,7 +381,7 @@ export default function PrivacyPolicyPage() {
               <li>The right to object to processing</li>
               <li>The right to withdraw consent at any time</li>
             </ul>
-          </section>
+          </CollapsibleSection>
         </CardContent>
       </Card>
     </div>
