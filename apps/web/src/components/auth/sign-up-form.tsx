@@ -176,7 +176,7 @@ export default function SignInForm({
             <FieldDescription className="text-center">
               By clicking continue, you agree to our{" "}
               <a href="/terms">Terms of Service</a> and{" "}
-              <a href="/privacy">Privacy Policy</a>.
+              <a href="/privacy-policy">Privacy Policy</a>.
             </FieldDescription>
           </CardFooter>
         </FieldGroup>
