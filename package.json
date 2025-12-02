@@ -30,7 +30,11 @@
     "db:push": "turbo -F @holiday-promo/db db:push",
     "db:studio": "turbo -F @holiday-promo/db db:studio",
     "db:generate": "turbo -F @holiday-promo/db db:generate",
-    "db:migrate": "turbo -F @holiday-promo/db db:migrate"
+    "db:migrate": "turbo -F @holiday-promo/db db:migrate",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.7",
