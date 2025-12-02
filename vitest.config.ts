@@ -5,8 +5,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: [path.resolve(__dirname, "vitest.setup.ts")],
+    setupFiles: [
+      path.resolve(__dirname, "vitest.setup.ts"),
+      path.resolve(__dirname, "apps/web/src/__tests__/setup/msw-setup.ts"),
+    ],
     css: false,
+    testTimeout: 10_000,
+    hookTimeout: 10_000,
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
