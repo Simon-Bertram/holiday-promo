@@ -44,7 +44,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-16">
+    <section className="mx-auto mt-24 flex w-full max-w-5xl flex-col gap-6 px-4 py-16">
       <header className="space-y-2">
         <h1 className="font-bold text-3xl">Profile</h1>
         <p className="text-muted-foreground">
