@@ -7,7 +7,7 @@ export default function Logo() {
     <Link className="flex items-center gap-2" href="/">
       <TreePalm className="h-6 w-6" />
       <span className={`${montserrat.variable} font-bold text-3xl`}>
-        Holiday Promotions
+        Holiday Uncle
       </span>
     </Link>
   );
