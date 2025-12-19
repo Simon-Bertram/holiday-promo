@@ -21,8 +21,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "holiday-promo",
-  description: "holiday-promo",
+  title: "Holiday Promo",
+  description: "Join the holiday rush with exclusive promotions and offers",
 };
 
 export default function RootLayout({

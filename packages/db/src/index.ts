@@ -5,7 +5,8 @@ import ws from "ws";
 neonConfig.webSocketConstructor = ws;
 
 // To work in edge environments (Cloudflare Workers, Vercel Edge, etc.), enable querying over fetch
-// neonConfig.poolQueryViaFetch = true;
+// This is enabled for Vercel Edge Function compatibility
+neonConfig.poolQueryViaFetch = true;
 
 const databaseUrl = process.env.DATABASE_URL;
 
