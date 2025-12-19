@@ -1,12 +1,19 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import type { authClient } from "@/lib/auth-client";
+import type { auth } from "@holiday-promo/auth";
+import type { user as userTable } from "@holiday-promo/db/schema/auth";
 import { orpc } from "@/utils/orpc";
 
-type Session = typeof authClient.$Infer.Session;
+type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
+type NonNullAuthSession = Exclude<AuthSession, null>;
+type SessionWithRole = NonNullAuthSession & {
+  user: NonNullAuthSession["user"] & {
+    role: (typeof userTable.$inferSelect)["role"];
+  };
+};
 
-export default function Dashboard({ session }: { session: Session }) {
+export default function Dashboard({ session }: { session: SessionWithRole }) {
   const usersQuery = useQuery(orpc.user.list.queryOptions());
 
   const sortedUsers = useMemo(

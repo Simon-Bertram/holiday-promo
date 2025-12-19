@@ -18,11 +18,9 @@
   "scripts": {
     "build": "tsdown"
   },
-  "devDependencies": {
-    "tsdown": "catalog:"
-  },
   "peerDependencies": {
     "drizzle-orm": "^0.44.7",
+    "next": "catalog:",
     "typescript": "^5"
   },
   "dependencies": {
@@ -30,10 +28,13 @@
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/zod": "catalog:",
-    "next": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:",
     "@holiday-promo/auth": "workspace:*",
     "@holiday-promo/db": "workspace:*"
+  },
+  "devDependencies": {
+    "next": "catalog:",
+    "tsdown": "catalog:"
   }
 }
