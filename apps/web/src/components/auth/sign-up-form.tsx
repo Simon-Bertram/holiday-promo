@@ -35,7 +35,6 @@ export default function SignInForm({
   const [turnstileToken, setTurnstileToken] = useState<string>("");
 
   const form = useForm<SignUpFormData>({
-    // @ts-expect-error - @hookform/resolvers v5.2.2 doesn't fully support Zod v4 types yet, but runtime works correctly
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",
