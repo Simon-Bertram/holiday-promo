@@ -7,8 +7,8 @@ import UserMenu from "./user-menu";
 
 export default function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-20 bg-gradient-to-t from-transparent to-white dark:to-black">
-      <div className="container mx-auto flex flex-row items-center justify-between bg-transparent px-2 py-1">
+    <header className="fixed inset-x-0 top-0 z-20 bg-linear-to-t from-transparent to-white dark:to-black">
+      <div className="container mx-auto flex flex-row items-center justify-between bg-transparent px-2 py-4">
         <nav className="my-2 flex w-full justify-between gap-4 bg-transparent align-middle font-black text-black text-xl drop-shadow dark:text-white">
           <Logo />
           <NavItems className="mr-4 hidden items-center gap-4 md:flex" />

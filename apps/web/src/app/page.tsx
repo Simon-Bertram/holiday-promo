@@ -1,40 +1,55 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import Hero from "@/components/hero/hero";
-import { orpc } from "@/utils/orpc";
+import { client, orpc } from "@/utils/orpc";
 
-const TITLE_TEXT = "Join the holiday rush";
+function formatError(error: unknown): string | undefined {
+  if (!error) {
+    return;
+  }
+
+  const errorDetails = {
+    message: error instanceof Error ? error.message : String(error),
+    name: error instanceof Error ? error.name : "Unknown",
+  };
+
+  return JSON.stringify(errorDetails);
+}
 
 export default function Home() {
   const healthCheck = useQuery(orpc.healthCheck.queryOptions());
+  const hasLoggedDisconnect = useRef(false);
 
-  return (
-    <>
-      <Hero />
-      <div className="container mx-auto max-w-3xl px-4 py-2">
-        <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-        <div className="grid gap-6">
-          <section className="grid gap-2 rounded-lg border p-4 text-center">
-            <h2 className="mb-2 font-medium">API Status</h2>
-            <div className="flex items-center gap-2">
-              <div
-                className={`h-2 w-2 rounded-full ${healthCheck.data ? "bg-green-500" : "bg-red-500"}`}
-              />
-              {(() => {
-                let statusText = "Checking...";
-                if (!healthCheck.isLoading) {
-                  statusText = healthCheck.data ? "Connected" : "Disconnected";
-                }
-                return (
-                  <span className="text-muted-foreground text-sm">
-                    {statusText}
-                  </span>
-                );
-              })()}
-            </div>
-          </section>
-        </div>
-      </div>
-    </>
-  );
+  useEffect(() => {
+    const isDisconnected = !(healthCheck.isLoading || healthCheck.data);
+
+    if (isDisconnected && !hasLoggedDisconnect.current) {
+      const errorMessage = formatError(healthCheck.error);
+
+      console.error("API Health Check: Disconnected", {
+        timestamp: new Date().toISOString(),
+        error: healthCheck.error,
+        status: "disconnected",
+      });
+
+      client.healthCheckLog
+        .log({
+          status: "disconnected",
+          error: errorMessage,
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to log health check disconnect:", error);
+        });
+
+      hasLoggedDisconnect.current = true;
+    }
+
+    // Reset the flag when connection is restored
+    if (healthCheck.data && hasLoggedDisconnect.current) {
+      hasLoggedDisconnect.current = false;
+    }
+  }, [healthCheck.isLoading, healthCheck.data, healthCheck.error]);
+
+  return <Hero />;
 }

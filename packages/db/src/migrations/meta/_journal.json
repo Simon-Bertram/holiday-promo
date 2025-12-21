@@ -15,6 +15,13 @@
       "when": 1763564000000,
       "tag": "0001_add_user_role",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766304314680,
+      "tag": "0002_grey_sasquatch",
+      "breakpoints": true
     }
   ]
 }
