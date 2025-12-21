@@ -1,8 +1,8 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 import type { auth } from "@holiday-promo/auth";
 import type { user as userTable } from "@holiday-promo/db/schema/auth";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { orpc } from "@/utils/orpc";
 
 type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
