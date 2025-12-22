@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { useFacebookSignIn } from "@/hooks/use-facebook-sign-in";

@@ -1,5 +1,8 @@
+"use client";
+
 import { Menu } from "lucide-react";
 import { useNavigation } from "@/app/hooks/use-navigation";
+import NavItems from "@/components/navigation/nav-items";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -10,7 +13,6 @@ import {
 } from "@/components/ui/sheet";
 import { ModeToggle } from "../mode-toggle";
 import UserMenu from "../user-menu";
-import NavItems from "./nav-items";
 
 export default function MobileMenu() {
   const { isMobileMenuOpen, openMobileMenu, closeMobileMenu } = useNavigation();

@@ -2,195 +2,214 @@
  * Tests for SignInForm component - Turnstile integration
  * Tests Turnstile widget integration, token capture, and validation
  */
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import SignInForm from './sign-in-form'
-import { VALID_TEST_TOKEN } from '@/__tests__/fixtures/turnstile'
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { VALID_TEST_TOKEN } from "@/__tests__/fixtures/turnstile";
+import SignInForm from "./sign-in-form";
 
 // Mock TurnstileWidget
-vi.mock('@/components/turnstile-widget', () => ({
-	default: ({ onSuccess, onError }: { onSuccess?: (token: string) => void; onError?: () => void }) => (
-		<div data-testid="turnstile-widget">
-			<button
-				data-testid="turnstile-success"
-				onClick={() => onSuccess?.(VALID_TEST_TOKEN)}
-				type="button"
-			>
-				Trigger Success
-			</button>
-			<button
-				data-testid="turnstile-error"
-				onClick={() => onError?.()}
-				type="button"
-			>
-				Trigger Error
-			</button>
-		</div>
-	),
-}))
+vi.mock("@/components/turnstile-widget", () => ({
+  default: ({
+    onSuccess,
+    onError,
+  }: {
+    onSuccess?: (token: string) => void;
+    onError?: () => void;
+  }) => (
+    <div data-testid="turnstile-widget">
+      <button
+        data-testid="turnstile-success"
+        onClick={() => onSuccess?.(VALID_TEST_TOKEN)}
+        type="button"
+      >
+        Trigger Success
+      </button>
+      <button
+        data-testid="turnstile-error"
+        onClick={() => onError?.()}
+        type="button"
+      >
+        Trigger Error
+      </button>
+    </div>
+  ),
+}));
 
 // Mock useSignIn hook
-vi.mock('@/hooks/use-sign-in', () => ({
-	useSignIn: () => ({
-		signIn: vi.fn().mockResolvedValue(undefined),
-		isLoading: false,
-	}),
-}))
+vi.mock("@/hooks/use-sign-in", () => ({
+  useSignIn: () => ({
+    signIn: vi.fn().mockResolvedValue(undefined),
+    isLoading: false,
+  }),
+}));
 
 // Mock authClient
-vi.mock('@/lib/auth-client', () => ({
-	authClient: {
-		useSession: () => ({
-			data: null,
-			isPending: false,
-		}),
-	},
-}))
+vi.mock("@/lib/auth-client", () => ({
+  authClient: {
+    useSession: () => ({
+      data: null,
+      isPending: false,
+    }),
+  },
+}));
 
-describe('SignInForm - Turnstile Integration', () => {
-	beforeEach(() => {
-		vi.clearAllMocks()
-	})
+// Regex patterns defined at top level for performance
+const LOGIN_BUTTON_REGEX = /login/i;
+const EMAIL_LABEL_REGEX = /email/i;
+const PASSWORD_LABEL_REGEX = /password/i;
+const VERIFICATION_REQUIRED_REGEX = /verification is required/i;
 
-	it('widget renders in form', () => {
-		render(<SignInForm />)
+describe("SignInForm - Turnstile Integration", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-		const widget = screen.getByTestId('turnstile-widget')
-		expect(widget).toBeInTheDocument()
-	})
+  it("widget renders in form", () => {
+    render(<SignInForm />);
 
-	it('token captured on widget success', async () => {
-		const user = userEvent.setup()
-		render(<SignInForm />)
+    const widget = screen.getByTestId("turnstile-widget");
+    expect(widget).toBeInTheDocument();
+  });
 
-		const successButton = screen.getByTestId('turnstile-success')
-		await user.click(successButton)
+  it("token captured on widget success", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm />);
 
-		// Token should be captured and stored in form state
-		await waitFor(() => {
-			// Form should be ready to submit with token
-			const submitButton = screen.getByRole('button', { name: /login/i })
-			expect(submitButton).toBeInTheDocument()
-		})
-	})
+    const successButton = screen.getByTestId("turnstile-success");
+    await user.click(successButton);
 
-	it('token stored in form state', async () => {
-		const user = userEvent.setup()
-		render(<SignInForm />)
+    // Token should be captured and stored in form state
+    await waitFor(() => {
+      // Form should be ready to submit with token
+      const submitButton = screen.getByRole("button", {
+        name: LOGIN_BUTTON_REGEX,
+      });
+      expect(submitButton).toBeInTheDocument();
+    });
+  });
 
-		const successButton = screen.getByTestId('turnstile-success')
-		await user.click(successButton)
+  it("token stored in form state", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm />);
 
-		// Fill form fields
-		const emailInput = screen.getByLabelText(/email/i)
-		const passwordInput = screen.getByLabelText(/password/i)
+    const successButton = screen.getByTestId("turnstile-success");
+    await user.click(successButton);
 
-		await user.type(emailInput, 'test@example.com')
-		await user.type(passwordInput, 'password123')
+    // Fill form fields
+    const emailInput = screen.getByLabelText(EMAIL_LABEL_REGEX);
+    const passwordInput = screen.getByLabelText(PASSWORD_LABEL_REGEX);
 
-		// Submit form
-		const submitButton = screen.getByRole('button', { name: /login/i })
-		await user.click(submitButton)
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "password123");
 
-		// Form should submit with token
-		await waitFor(() => {
-			expect(submitButton).toBeInTheDocument()
-		})
-	})
+    // Submit form
+    const submitButton = screen.getByRole("button", {
+      name: LOGIN_BUTTON_REGEX,
+    });
+    await user.click(submitButton);
 
-	it('form validation requires token', async () => {
-		const user = userEvent.setup()
-		render(<SignInForm />)
+    // Form should submit with token
+    await waitFor(() => {
+      expect(submitButton).toBeInTheDocument();
+    });
+  });
 
-		// Fill form fields without triggering Turnstile success
-		const emailInput = screen.getByLabelText(/email/i)
-		const passwordInput = screen.getByLabelText(/password/i)
+  it("form validation requires token", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm />);
 
-		await user.type(emailInput, 'test@example.com')
-		await user.type(passwordInput, 'password123')
+    // Fill form fields without triggering Turnstile success
+    const emailInput = screen.getByLabelText(EMAIL_LABEL_REGEX);
+    const passwordInput = screen.getByLabelText(PASSWORD_LABEL_REGEX);
 
-		// Try to submit without token
-		const submitButton = screen.getByRole('button', { name: /login/i })
-		await user.click(submitButton)
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "password123");
 
-		// Form should show validation error or prevent submission
-		await waitFor(() => {
-			// Check for error message or form not submitting
-			const errorMessage = screen.queryByText(/verification is required/i)
-			expect(errorMessage || submitButton).toBeTruthy()
-		})
-	})
+    // Try to submit without token
+    const submitButton = screen.getByRole("button", {
+      name: LOGIN_BUTTON_REGEX,
+    });
+    await user.click(submitButton);
 
-	it('form submission includes token', async () => {
-		const user = userEvent.setup()
-		const { useSignIn } = await import('@/hooks/use-sign-in')
-		const signInMock = vi.fn().mockResolvedValue(undefined)
+    // Form should show validation error or prevent submission
+    await waitFor(() => {
+      // Check for error message or form not submitting
+      const errorMessage = screen.queryByText(VERIFICATION_REQUIRED_REGEX);
+      expect(errorMessage || submitButton).toBeTruthy();
+    });
+  });
 
-		vi.mocked(useSignIn).mockReturnValue({
-			signIn: signInMock,
-			isLoading: false,
-		})
+  it("form submission includes token", async () => {
+    const user = userEvent.setup();
+    const { useSignIn } = await import("@/hooks/use-sign-in");
+    const signInMock = vi.fn().mockResolvedValue(undefined);
 
-		render(<SignInForm />)
+    vi.mocked(useSignIn).mockReturnValue({
+      signIn: signInMock,
+      isLoading: false,
+    });
 
-		// Trigger Turnstile success
-		const successButton = screen.getByTestId('turnstile-success')
-		await user.click(successButton)
+    render(<SignInForm />);
 
-		// Fill form
-		const emailInput = screen.getByLabelText(/email/i)
-		const passwordInput = screen.getByLabelText(/password/i)
+    // Trigger Turnstile success
+    const successButton = screen.getByTestId("turnstile-success");
+    await user.click(successButton);
 
-		await user.type(emailInput, 'test@example.com')
-		await user.type(passwordInput, 'password123')
+    // Fill form
+    const emailInput = screen.getByLabelText(EMAIL_LABEL_REGEX);
+    const passwordInput = screen.getByLabelText(PASSWORD_LABEL_REGEX);
 
-		// Submit
-		const submitButton = screen.getByRole('button', { name: /login/i })
-		await user.click(submitButton)
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "password123");
 
-		await waitFor(() => {
-			expect(signInMock).toHaveBeenCalledWith(
-				expect.objectContaining({
-					turnstileToken: VALID_TEST_TOKEN,
-				})
-			)
-		})
-	})
+    // Submit
+    const submitButton = screen.getByRole("button", {
+      name: LOGIN_BUTTON_REGEX,
+    });
+    await user.click(submitButton);
 
-	it('error handling when widget fails', async () => {
-		const user = userEvent.setup()
-		render(<SignInForm />)
+    await waitFor(() => {
+      expect(signInMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          turnstileToken: VALID_TEST_TOKEN,
+        })
+      );
+    });
+  });
 
-		const errorButton = screen.getByTestId('turnstile-error')
-		await user.click(errorButton)
+  it("error handling when widget fails", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm />);
 
-		// Token should be cleared on error
-		await waitFor(() => {
-			// Form state should reflect error
-			const widget = screen.getByTestId('turnstile-widget')
-			expect(widget).toBeInTheDocument()
-		})
-	})
+    const errorButton = screen.getByTestId("turnstile-error");
+    await user.click(errorButton);
 
-	it('token cleared on widget error', async () => {
-		const user = userEvent.setup()
-		render(<SignInForm />)
+    // Token should be cleared on error
+    await waitFor(() => {
+      // Form state should reflect error
+      const widget = screen.getByTestId("turnstile-widget");
+      expect(widget).toBeInTheDocument();
+    });
+  });
 
-		// First trigger success
-		const successButton = screen.getByTestId('turnstile-success')
-		await user.click(successButton)
+  it("token cleared on widget error", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm />);
 
-		// Then trigger error
-		const errorButton = screen.getByTestId('turnstile-error')
-		await user.click(errorButton)
+    // First trigger success
+    const successButton = screen.getByTestId("turnstile-success");
+    await user.click(successButton);
 
-		// Token should be cleared
-		await waitFor(() => {
-			// Form should require token again
-			const widget = screen.getByTestId('turnstile-widget')
-			expect(widget).toBeInTheDocument()
-		})
-	})
-})
+    // Then trigger error
+    const errorButton = screen.getByTestId("turnstile-error");
+    await user.click(errorButton);
 
+    // Token should be cleared
+    await waitFor(() => {
+      // Form should require token again
+      const widget = screen.getByTestId("turnstile-widget");
+      expect(widget).toBeInTheDocument();
+    });
+  });
+});
