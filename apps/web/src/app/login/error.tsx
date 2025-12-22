@@ -36,7 +36,7 @@ export default function LoginError({
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-destructive">
+          <CardTitle as="h1" className="text-destructive">
             Something went wrong
           </CardTitle>
           <CardDescription>

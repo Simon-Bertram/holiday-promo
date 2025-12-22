@@ -154,7 +154,11 @@ export default function SignUpForm() {
               />
             </Field>
             <Field>
-              <Button disabled={form.formState.isSubmitting} type="submit">
+              <Button
+                aria-busy={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting}
+                type="submit"
+              >
                 {form.formState.isSubmitting ? "loading" : "Sign Up"}
               </Button>
             </Field>

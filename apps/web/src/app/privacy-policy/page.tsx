@@ -14,7 +14,9 @@ export default function PrivacyPolicyPage() {
     <div className="container mx-auto mt-24 max-w-4xl px-4 py-12">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl">Privacy Policy</CardTitle>
+          <CardTitle as="h1" className="text-3xl">
+            Privacy Policy
+          </CardTitle>
           <CardDescription>
             Last updated:{" "}
             {new Date().toLocaleDateString("en-US", {

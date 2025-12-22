@@ -55,10 +55,23 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
             </FormItem>
           )}
         />
-        <Button className="w-full" disabled={isSubmitting} type="submit">
+        <Button
+          aria-busy={isSubmitting}
+          className="w-full"
+          disabled={isSubmitting}
+          type="submit"
+        >
           {isSubmitting ? "Saving changes..." : "Save changes"}
         </Button>
-        {error ? <p className="text-destructive text-sm">{error}</p> : null}
+        {error ? (
+          <p
+            aria-live="polite"
+            className="text-destructive text-sm"
+            role="alert"
+          >
+            {error}
+          </p>
+        ) : null}
       </form>
     </Form>
   );

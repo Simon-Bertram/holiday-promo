@@ -25,7 +25,9 @@ export default function DashboardError({
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-destructive">Dashboard Error</CardTitle>
+          <CardTitle as="h1" className="text-destructive">
+            Dashboard Error
+          </CardTitle>
           <CardDescription>
             We couldn't load your dashboard. Please try again.
           </CardDescription>

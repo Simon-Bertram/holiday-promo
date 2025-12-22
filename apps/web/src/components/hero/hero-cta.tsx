@@ -12,7 +12,10 @@ export default function HeroCta() {
   return (
     <Card className="bg-white/50 backdrop-blur-sm dark:bg-black/50">
       <CardHeader>
-        <CardTitle className="font-black text-2xl text-black sm:text-3xl md:text-4xl lg:text-5xl dark:text-white">
+        <CardTitle
+          as="h1"
+          className="font-black text-2xl text-black sm:text-3xl md:text-4xl lg:text-5xl dark:text-white"
+        >
           Unlock your best holiday yet
         </CardTitle>
         <CardDescription className="text-black dark:text-white">

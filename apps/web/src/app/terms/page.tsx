@@ -14,7 +14,9 @@ export default function TermsOfServicePage() {
     <div className="container mx-auto mt-24 max-w-4xl px-4 py-12">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl">Terms of Service</CardTitle>
+          <CardTitle as="h1" className="text-3xl">
+            Terms of Service
+          </CardTitle>
           <CardDescription>
             Last updated:{" "}
             {new Date().toLocaleDateString("en-US", {

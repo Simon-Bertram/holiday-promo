@@ -76,7 +76,12 @@ export function ContactForm() {
             </FormItem>
           )}
         />
-        <Button className="w-full" disabled={isSubmitting} type="submit">
+        <Button
+          aria-busy={isSubmitting}
+          className="w-full"
+          disabled={isSubmitting}
+          type="submit"
+        >
           {isSubmitting ? "Sending..." : "Send message"}
         </Button>
       </form>

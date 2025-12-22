@@ -141,7 +141,11 @@ export default function SignInForm() {
               />
             </Field>
             <Field>
-              <Button disabled={form.formState.isSubmitting} type="submit">
+              <Button
+                aria-busy={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting}
+                type="submit"
+              >
                 {form.formState.isSubmitting ? "loading" : "Login"}
               </Button>
             </Field>
