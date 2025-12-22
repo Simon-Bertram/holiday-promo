@@ -6,6 +6,9 @@ export const ERROR_MESSAGES = {
     ACCESS_RESOURCE: "You are not authorized to access this resource",
     UPDATE_PROFILE: "Only subscribers can update their profiles",
   },
+  BAD_REQUEST: {
+    USER_ID_REQUIRED: "User ID is required",
+  },
   CONFLICT: {
     EMAIL_EXISTS: "That email address is already in use",
   },
