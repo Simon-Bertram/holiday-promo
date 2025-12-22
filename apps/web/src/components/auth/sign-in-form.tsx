@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GalleryVerticalEnd } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
@@ -25,11 +26,7 @@ import { useSignIn } from "@/hooks/use-sign-in";
 import { authClient } from "@/lib/auth-client";
 import { type SignInFormData, signInSchema } from "@/lib/validations/auth";
 
-export default function SignInForm({
-  onSwitchToSignUp,
-}: {
-  onSwitchToSignUp: () => void;
-}) {
+export default function SignInForm() {
   const { isPending } = authClient.useSession();
   const { signIn } = useSignIn();
   const [turnstileToken, setTurnstileToken] = useState<string>("");
@@ -84,16 +81,9 @@ export default function SignInForm({
             <h1 className="font-bold text-xl">Welcome to Acme Inc.</h1>
             <FieldDescription>
               Don&apos;t have an account?{" "}
-              <button
-                className="underline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onSwitchToSignUp();
-                }}
-                type="button"
-              >
+              <Link className="underline" href="/signup">
                 Sign up
-              </button>
+              </Link>
             </FieldDescription>
           </CardHeader>
           <CardContent className="space-y-6">

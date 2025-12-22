@@ -1,7 +1,9 @@
 "use client";
+import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { montserrat } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
@@ -43,6 +45,20 @@ export default function NavItems({ className, onItemClick }: NavItemsProps) {
   }, [session]);
 
   const isCurrentPage = (href: string) => pathname === href;
+
+  // Show sign-in button when user is not logged in
+  if (!session?.user) {
+    return (
+      <div className={className}>
+        <Button asChild onClick={onItemClick} variant="outline">
+          <Link className="flex items-center gap-2" href="/login">
+            <User className="size-4" />
+            <span>Sign In</span>
+          </Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className={className}>

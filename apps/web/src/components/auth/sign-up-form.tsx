@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GalleryVerticalEnd } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
@@ -25,11 +26,7 @@ import { useSignUp } from "@/hooks/use-sign-up";
 import { authClient } from "@/lib/auth-client";
 import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth";
 
-export default function SignInForm({
-  onSwitchToSignIn,
-}: {
-  onSwitchToSignIn: () => void;
-}) {
+export default function SignUpForm() {
   const { isPending } = authClient.useSession();
   const { signUp } = useSignUp();
   const [turnstileToken, setTurnstileToken] = useState<string>("");
@@ -87,16 +84,9 @@ export default function SignInForm({
             </h1>
             <FieldDescription>
               Already have an account?{" "}
-              <button
-                className="underline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onSwitchToSignIn();
-                }}
-                type="button"
-              >
+              <Link className="underline" href="/login">
                 Sign in
-              </button>
+              </Link>
             </FieldDescription>
           </CardHeader>
           <CardContent className="space-y-6">

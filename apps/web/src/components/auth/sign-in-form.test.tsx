@@ -54,7 +54,7 @@ describe('SignInForm - Turnstile Integration', () => {
 	})
 
 	it('widget renders in form', () => {
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		const widget = screen.getByTestId('turnstile-widget')
 		expect(widget).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('SignInForm - Turnstile Integration', () => {
 
 	it('token captured on widget success', async () => {
 		const user = userEvent.setup()
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		const successButton = screen.getByTestId('turnstile-success')
 		await user.click(successButton)
@@ -77,7 +77,7 @@ describe('SignInForm - Turnstile Integration', () => {
 
 	it('token stored in form state', async () => {
 		const user = userEvent.setup()
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		const successButton = screen.getByTestId('turnstile-success')
 		await user.click(successButton)
@@ -101,7 +101,7 @@ describe('SignInForm - Turnstile Integration', () => {
 
 	it('form validation requires token', async () => {
 		const user = userEvent.setup()
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		// Fill form fields without triggering Turnstile success
 		const emailInput = screen.getByLabelText(/email/i)
@@ -132,7 +132,7 @@ describe('SignInForm - Turnstile Integration', () => {
 			isLoading: false,
 		})
 
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		// Trigger Turnstile success
 		const successButton = screen.getByTestId('turnstile-success')
@@ -160,7 +160,7 @@ describe('SignInForm - Turnstile Integration', () => {
 
 	it('error handling when widget fails', async () => {
 		const user = userEvent.setup()
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		const errorButton = screen.getByTestId('turnstile-error')
 		await user.click(errorButton)
@@ -175,7 +175,7 @@ describe('SignInForm - Turnstile Integration', () => {
 
 	it('token cleared on widget error', async () => {
 		const user = userEvent.setup()
-		render(<SignInForm onSwitchToSignUp={() => {}} />)
+		render(<SignInForm />)
 
 		// First trigger success
 		const successButton = screen.getByTestId('turnstile-success')

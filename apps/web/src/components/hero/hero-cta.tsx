@@ -21,7 +21,7 @@ export default function HeroCta() {
       </CardHeader>
       <CardContent>
         <Button asChild>
-          <Link href="/login">Sign up now</Link>
+          <Link href="/signup">Sign up now</Link>
         </Button>
       </CardContent>
     </Card>
