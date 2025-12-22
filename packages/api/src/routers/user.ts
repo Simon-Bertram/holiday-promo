@@ -4,6 +4,7 @@ import { ORPCError } from "@orpc/server";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { adminProcedure, protectedProcedure } from "../index";
 import { deleteUserById } from "../services/delete-user";
+import { ERROR_MESSAGES } from "../utils/error-messages";
 import {
   type UpdateProfileInput,
   updateProfileInputSchema,
@@ -51,7 +52,7 @@ export const userRouter = {
 
       if (sessionUser.role !== "subscriber") {
         throw new ORPCError("FORBIDDEN", {
-          message: "Only subscribers can update their profiles",
+          message: ERROR_MESSAGES.FORBIDDEN.UPDATE_PROFILE,
         });
       }
 
@@ -68,7 +69,7 @@ export const userRouter = {
 
         if (existingUser) {
           throw new ORPCError("CONFLICT", {
-            message: "That email address is already in use",
+            message: ERROR_MESSAGES.CONFLICT.EMAIL_EXISTS,
           });
         }
       }
@@ -85,7 +86,7 @@ export const userRouter = {
 
       if (!updatedUser) {
         throw new ORPCError("NOT_FOUND", {
-          message: "Unable to update profile",
+          message: ERROR_MESSAGES.NOT_FOUND.UPDATE_PROFILE,
         });
       }
 
