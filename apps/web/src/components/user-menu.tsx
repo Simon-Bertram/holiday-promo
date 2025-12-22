@@ -30,10 +30,6 @@ export default function UserMenu() {
   const { data: session, isPending } = authClient.useSession();
   const { closeMobileMenu } = useNavigation();
 
-  if (isPending) {
-    return <Skeleton className="h-9 w-24" />;
-  }
-
   const roleLink: {
     href: "/dashboard" | "/profile";
     label: "Dashboard" | "My Profile";
@@ -47,18 +43,26 @@ export default function UserMenu() {
     return { href: "/profile", label: "My Profile" };
   })();
 
+  const buttonContent = (() => {
+    if (isPending) {
+      return <Skeleton className="h-4 w-20" />;
+    }
+    if (session?.user) {
+      return <span className="truncate">{session.user.name}</span>;
+    }
+    return (
+      <>
+        <User className="size-4 shrink-0" />
+        <span className="sr-only">User menu</span>
+      </>
+    );
+  })();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button>
-          {session?.user ? (
-            session.user.name
-          ) : (
-            <>
-              <User className="size-4" />
-              <span className="sr-only">User menu</span>
-            </>
-          )}
+        <Button className="min-w-24" disabled={isPending}>
+          {buttonContent}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-card">

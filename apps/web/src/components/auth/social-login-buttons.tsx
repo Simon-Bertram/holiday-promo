@@ -60,7 +60,9 @@ export function SocialLoginButtons() {
         variant="outline"
       >
         <MetaIcon />
-        {isFacebookLoading ? "Loading..." : "Meta"}
+        <span className="min-w-18 text-center">
+          {isFacebookLoading ? "Loading..." : "Meta"}
+        </span>
         <span className="sr-only">Login with Meta</span>
       </Button>
       <Button
@@ -70,7 +72,9 @@ export function SocialLoginButtons() {
         variant="outline"
       >
         <GoogleIcon />
-        {isGoogleLoading ? "Loading..." : "Google"}
+        <span className="min-w-18 text-center">
+          {isGoogleLoading ? "Loading..." : "Google"}
+        </span>
         <span className="sr-only">Login with Google</span>
       </Button>
     </Field>

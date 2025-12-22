@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CollapsibleSection } from "@/components/legal/collapsible-section";
 import {
   Card,
   CardContent,
@@ -7,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CollapsibleSection } from "@/components/legal/collapsible-section";
 
 export default function TermsOfServicePage() {
   return (
