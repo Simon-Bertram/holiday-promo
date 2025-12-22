@@ -21,29 +21,19 @@ const defaultUserSelect = {
 export const userRouter = {
   me: protectedProcedure.handler(({ context }) => {
     // Session is guaranteed to exist by protectedProcedure middleware
-    // This check is redundant but kept as a safety guard
-    if (!context.session?.user) {
-      throw new ORPCError("UNAUTHORIZED", {
-        message: "You must be logged in to access this resource",
-      });
-    }
+    const sessionUser = context.session.user;
     return {
-      id: context.session.user.id,
-      name: context.session.user.name,
-      email: context.session.user.email,
-      role: context.session.user.role,
+      id: sessionUser.id,
+      name: sessionUser.name,
+      email: sessionUser.email,
+      role: sessionUser.role,
     };
   }),
   list: adminProcedure.handler(async () =>
     db.select(defaultUserSelect).from(user).orderBy(desc(user.createdAt))
   ),
   delete: protectedProcedure.handler(async ({ context }) => {
-    if (!context.session?.user) {
-      throw new ORPCError("UNAUTHORIZED", {
-        message: "You must be logged in to delete your account",
-      });
-    }
-
+    // Session is guaranteed to exist by protectedProcedure middleware
     const userId = context.session.user.id;
 
     await deleteUserById(userId);
@@ -56,12 +46,7 @@ export const userRouter = {
   updateProfile: protectedProcedure
     .input(updateProfileInputSchema)
     .handler(async ({ context, input }) => {
-      if (!context.session?.user) {
-        throw new ORPCError("UNAUTHORIZED", {
-          message: "You must be logged in to update your profile",
-        });
-      }
-
+      // Session is guaranteed to exist by protectedProcedure middleware
       const sessionUser = context.session.user;
 
       if (sessionUser.role !== "subscriber") {
