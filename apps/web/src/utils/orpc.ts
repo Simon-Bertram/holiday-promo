@@ -11,6 +11,14 @@ import { toast } from "sonner";
  * and provides a retry action to invalidate all queries.
  */
 export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
   queryCache: new QueryCache({
     onError: (error) => {
       toast.error(`Error: ${error.message}`, {
@@ -33,9 +41,9 @@ export const queryClient = new QueryClient({
  */
 export const link = new RPCLink({
   url: `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3001"}/api/rpc`,
-  fetch(url, options) {
-    return fetch(url, {
-      ...options,
+  fetch(requestUrl, requestOptions) {
+    return globalThis.fetch(requestUrl, {
+      ...requestOptions,
       credentials: "include",
     });
   },

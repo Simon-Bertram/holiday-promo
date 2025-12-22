@@ -7,7 +7,7 @@ import { montserrat } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
-  href: "/" | "/dashboard" | "/profile";
+  href: "/dashboard" | "/profile";
   label: string;
 };
 
@@ -17,9 +17,8 @@ type NavItemsProps = {
 };
 
 type SessionData = ReturnType<typeof authClient.useSession>["data"];
-type SessionUser = NonNullable<SessionData> extends { user: infer U }
-  ? U
-  : never;
+type SessionUser =
+  NonNullable<SessionData> extends { user: infer U } ? U : never;
 
 const hasRole = (
   user: SessionUser | undefined
@@ -31,10 +30,8 @@ export default function NavItems({ className, onItemClick }: NavItemsProps) {
   const { data: session } = authClient.useSession();
 
   const navItems: NavItem[] = useMemo(() => {
-    const base: NavItem[] = [{ href: "/", label: "Home" }];
-
     if (!session?.user) {
-      return base;
+      return [];
     }
 
     const roleItem: NavItem =
@@ -42,7 +39,7 @@ export default function NavItems({ className, onItemClick }: NavItemsProps) {
         ? { href: "/dashboard", label: "Dashboard" }
         : { href: "/profile", label: "Profile" };
 
-    return [...base, roleItem];
+    return [roleItem];
   }, [session]);
 
   const isCurrentPage = (href: string) => pathname === href;

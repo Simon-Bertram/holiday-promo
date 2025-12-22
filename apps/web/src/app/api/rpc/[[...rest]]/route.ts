@@ -15,6 +15,14 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
 
 /**
+ * Route segment configuration for API routes
+ * - runtime: Use Node.js runtime (can be changed to "edge" if compatible)
+ * - dynamic: Force dynamic rendering for authenticated routes
+ */
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
  * Extracts request information from oRPC's request object
  * Handles different request types (URL object, string, etc.) safely
  */
