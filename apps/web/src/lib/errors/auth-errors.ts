@@ -47,29 +47,40 @@ const ERROR_MESSAGE_MAP: Record<string, string> = {
 };
 
 /**
+ * Checks if error message contains specific keywords
+ */
+function messageContains(
+	message: string,
+	keywords: string[],
+): boolean {
+	const lowerMessage = message.toLowerCase();
+	return keywords.some((keyword) => lowerMessage.includes(keyword));
+}
+
+/**
  * Determines the error code from Better Auth error
  */
 function getErrorCode(error: BetterAuthError): AuthErrorCode {
-  const message = error.error.message?.toLowerCase() || "";
-  const statusText = error.error.statusText?.toLowerCase() || "";
+	const message = error.error.message?.toLowerCase() || "";
+	const statusText = error.error.statusText?.toLowerCase() || "";
 
-  if (message.includes("invalid") || message.includes("incorrect")) {
-    return "INVALID_CREDENTIALS";
-  }
-  if (message.includes("locked") || message.includes("too many")) {
-    return "ACCOUNT_LOCKED";
-  }
-  if (message.includes("not verified") || message.includes("verification")) {
-    return "EMAIL_NOT_VERIFIED";
-  }
-  if (statusText.includes("unauthorized") || statusText === "401") {
-    return "UNAUTHORIZED";
-  }
-  if (message.includes("network") || message.includes("fetch")) {
-    return "NETWORK_ERROR";
-  }
+	if (messageContains(message, ["invalid", "incorrect"])) {
+		return "INVALID_CREDENTIALS";
+	}
+	if (messageContains(message, ["locked", "too many"])) {
+		return "ACCOUNT_LOCKED";
+	}
+	if (messageContains(message, ["not verified", "verification"])) {
+		return "EMAIL_NOT_VERIFIED";
+	}
+	if (statusText.includes("unauthorized") || statusText === "401") {
+		return "UNAUTHORIZED";
+	}
+	if (messageContains(message, ["network", "fetch"])) {
+		return "NETWORK_ERROR";
+	}
 
-  return "UNKNOWN_ERROR";
+	return "UNKNOWN_ERROR";
 }
 
 /**
@@ -107,53 +118,65 @@ function getUserFriendlyMessage(
 }
 
 /**
+ * Checks if error is a Better Auth error structure
+ */
+function isBetterAuthError(error: unknown): error is BetterAuthError {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"error" in error &&
+		typeof (error as BetterAuthError).error === "object"
+	);
+}
+
+/**
+ * Normalizes standard Error instances to AuthError
+ */
+function normalizeStandardError(error: Error): AuthError {
+	const message = error.message.toLowerCase();
+	let code: AuthErrorCode = "UNKNOWN_ERROR";
+
+	if (messageContains(message, ["network", "fetch"])) {
+		code = "NETWORK_ERROR";
+	} else if (message.includes("unauthorized")) {
+		code = "UNAUTHORIZED";
+	}
+
+	return {
+		code,
+		message: error.message || "An unexpected error occurred. Please try again.",
+		originalError: error,
+	};
+}
+
+/**
  * Normalizes Better Auth errors into structured AuthError format
  * Following oRPC error handling patterns for consistency
  */
 export function normalizeAuthError(error: unknown): AuthError {
-  // Handle Better Auth error structure
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "error" in error &&
-    typeof (error as BetterAuthError).error === "object"
-  ) {
-    const authError = error as BetterAuthError;
-    const code = getErrorCode(authError);
-    const message = getUserFriendlyMessage(authError, code);
+	// Handle Better Auth error structure
+	if (isBetterAuthError(error)) {
+		const code = getErrorCode(error);
+		const message = getUserFriendlyMessage(error, code);
 
-    return {
-      code,
-      message,
-      originalError: error,
-    };
-  }
+		return {
+			code,
+			message,
+			originalError: error,
+		};
+	}
 
-  // Handle standard Error instances
-  if (error instanceof Error) {
-    const message = error.message.toLowerCase();
-    let code: AuthErrorCode = "UNKNOWN_ERROR";
+	// Handle standard Error instances
+	if (error instanceof Error) {
+		return normalizeStandardError(error);
+	}
 
-    if (message.includes("network") || message.includes("fetch")) {
-      code = "NETWORK_ERROR";
-    } else if (message.includes("unauthorized")) {
-      code = "UNAUTHORIZED";
-    }
-
-    return {
-      code,
-      message:
-        error.message || "An unexpected error occurred. Please try again.",
-      originalError: error,
-    };
-  }
-
-  // Fallback for unknown error types
-  return {
-    code: "UNKNOWN_ERROR",
-    message: "An unexpected error occurred. Please try again.",
-    originalError: error,
-  };
+	// Fallback for unknown error types
+	return {
+		code: "UNKNOWN_ERROR",
+		message: "An unexpected error occurred. Please try again.",
+		originalError: error,
+	};
 }
 
 /**

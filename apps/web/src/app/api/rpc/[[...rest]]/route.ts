@@ -13,6 +13,9 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
+import { createErrorLogger } from "@/utils/error-logger";
+import { createErrorResponse } from "@/utils/error-response";
+import { getNextRequestInfo } from "@/utils/request-info";
 
 /**
  * Route segment configuration for API routes
@@ -23,62 +26,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Extracts request information from oRPC's request object
- * Handles different request types (URL object, string, etc.) safely
- */
-function getRequestInfo(request: unknown) {
-  if (!request || typeof request !== "object") {
-    return {
-      url: undefined,
-      method: undefined,
-      userAgent: undefined,
-      ipAddress: undefined,
-    };
-  }
-
-  const req = request as Record<string, unknown>;
-  let url: string | undefined;
-  if (req.url instanceof URL) {
-    url = req.url.toString();
-  } else if (typeof req.url === "string") {
-    url = req.url;
-  }
-  const method = typeof req.method === "string" ? req.method : undefined;
-  const headers =
-    req.headers && typeof req.headers === "object"
-      ? (req.headers as { get?: (name: string) => string | null })
-      : undefined;
-
-  return {
-    url,
-    method,
-    userAgent: headers?.get?.("user-agent") || undefined,
-    ipAddress:
-      headers?.get?.("x-forwarded-for") ||
-      headers?.get?.("x-real-ip") ||
-      undefined,
-  };
-}
-
-/**
  * RPC Handler - Processes all oRPC procedure calls
  * Error interceptor logs errors with full context (user, request, etc.)
  */
 const rpcHandler = new RPCHandler(appRouter, {
-  interceptors: [
-    onError((error, { request, context }) => {
-      const requestInfo = getRequestInfo(request);
-      logError(error, {
-        type: "RPC",
-        userId: context?.session?.user?.id,
-        path: requestInfo.url,
-        method: requestInfo.method,
-        url: requestInfo.url,
-        userAgent: requestInfo.userAgent,
-        ipAddress: requestInfo.ipAddress,
-      });
-    }),
-  ],
+  interceptors: [onError(createErrorLogger("RPC"))],
 });
 
 /**
@@ -91,20 +43,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
       schemaConverters: [new ZodToJsonSchemaConverter()],
     }),
   ],
-  interceptors: [
-    onError((error, { request, context }) => {
-      const requestInfo = getRequestInfo(request);
-      logError(error, {
-        type: "OPENAPI",
-        userId: context?.session?.user?.id,
-        path: requestInfo.url,
-        method: requestInfo.method,
-        url: requestInfo.url,
-        userAgent: requestInfo.userAgent,
-        ipAddress: requestInfo.ipAddress,
-      });
-    }),
-  ],
+  interceptors: [onError(createErrorLogger("OPENAPI"))],
 });
 
 /**
@@ -118,14 +57,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
  * 5. Return 404 if neither matches
  */
 async function handleRequest(req: NextRequest) {
-  // Extract request info upfront for error logging context
-  const requestUrl = req.url.toString();
-  const requestMethod = req.method;
-  const userAgent = req.headers.get("user-agent") || undefined;
-  const ipAddress =
-    req.headers.get("x-forwarded-for") ||
-    req.headers.get("x-real-ip") ||
-    undefined;
+  const requestInfo = getNextRequestInfo(req);
 
   try {
     // Create context with authenticated session from Better Auth
@@ -155,24 +87,13 @@ async function handleRequest(req: NextRequest) {
     // Catch unexpected errors (errors in handlers are caught by interceptors)
     logError(error, {
       type: "REQUEST",
-      path: requestUrl,
-      method: requestMethod,
-      url: requestUrl,
-      userAgent,
-      ipAddress,
+      path: requestInfo.url,
+      method: requestInfo.method,
+      url: requestInfo.url,
+      userAgent: requestInfo.userAgent,
+      ipAddress: requestInfo.ipAddress,
     });
-    return new Response(
-      JSON.stringify({
-        message: "Internal server error",
-        ...(process.env.NODE_ENV === "development" && {
-          error: error instanceof Error ? error.message : String(error),
-        }),
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return createErrorResponse(error);
   }
 }
 
