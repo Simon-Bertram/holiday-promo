@@ -35,7 +35,7 @@ export default function MobileMenu() {
           className="p-6 md:hidden"
           size="icon"
         >
-          <Menu className="size-6" />
+          <Menu aria-hidden="true" className="size-6" />
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>

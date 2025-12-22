@@ -7,7 +7,7 @@ const blurDataURL =
 
 export default function Hero() {
   return (
-    <div className="relative flex min-h-dvh w-full items-end justify-start">
+    <section className="relative flex min-h-dvh w-full items-end justify-start">
       {/* Full-screen hero background image */}
       <Image
         alt="Holiday destination background"
@@ -23,6 +23,6 @@ export default function Hero() {
       <div className="z-10 mb-6 ml-4 flex w-full max-w-md flex-col sm:mb-8 sm:ml-6 md:mb-10 md:ml-8 md:w-1/2 lg:ml-12">
         <HeroCta />
       </div>
-    </div>
+    </section>
   );
 }

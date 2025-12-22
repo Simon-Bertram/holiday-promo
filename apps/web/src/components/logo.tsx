@@ -5,7 +5,7 @@ import { montserrat } from "@/lib/fonts";
 export default function Logo() {
   return (
     <Link className="flex items-center gap-2" href="/">
-      <TreePalm className="h-6 w-6" />
+      <TreePalm aria-hidden="true" className="h-6 w-6" />
       <span className={`${montserrat.variable} font-bold text-3xl`}>
         Holiday Uncle
       </span>

@@ -71,15 +71,15 @@ export default function SignInForm() {
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <FieldGroup>
           <CardHeader className="flex flex-col items-center gap-2 text-center">
-            <a
+            <Link
               className="flex flex-col items-center gap-2 font-medium"
               href="/"
             >
               <div className="flex size-8 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-6" />
+                <GalleryVerticalEnd aria-hidden="true" className="size-6" />
               </div>
               <span className="sr-only">Acme Inc.</span>
-            </a>
+            </Link>
             <h1 className="font-bold text-xl">Welcome to Acme Inc.</h1>
             <FieldDescription>
               Don&apos;t have an account?{" "}
@@ -154,8 +154,14 @@ export default function SignInForm() {
           <CardFooter>
             <FieldDescription className="text-center">
               By clicking continue, you agree to our{" "}
-              <a href="/terms">Terms of Service</a> and{" "}
-              <a href="/privacy">Privacy Policy</a>.
+              <Link className="underline" href="/terms">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link className="underline" href="/privacy-policy">
+                Privacy Policy
+              </Link>
+              .
             </FieldDescription>
           </CardFooter>
         </FieldGroup>

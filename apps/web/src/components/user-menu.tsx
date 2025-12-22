@@ -52,7 +52,7 @@ export default function UserMenu() {
     }
     return (
       <>
-        <User className="size-4 shrink-0" />
+        <User aria-hidden="true" className="size-4 shrink-0" />
         <span className="sr-only">User menu</span>
       </>
     );
