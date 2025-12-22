@@ -10,6 +10,7 @@ import {
   updateProfileInputSchema,
 } from "./user/update-profile.schema";
 
+// Default fields to select when querying user data
 const defaultUserSelect = {
   id: user.id,
   name: user.name,
@@ -20,6 +21,7 @@ const defaultUserSelect = {
 };
 
 export const userRouter = {
+  // Get current authenticated user's profile information
   me: protectedProcedure.handler(({ context }) => {
     // Session is guaranteed to exist by protectedProcedure middleware
     const sessionUser = context.session.user;
@@ -30,9 +32,13 @@ export const userRouter = {
       role: sessionUser.role,
     };
   }),
+
+  // List all users (admin only) - ordered by creation date, newest first
   list: adminProcedure.handler(async () =>
     db.select(defaultUserSelect).from(user).orderBy(desc(user.createdAt))
   ),
+
+  // Delete current user's account
   delete: protectedProcedure.handler(async ({ context }) => {
     // Session is guaranteed to exist by protectedProcedure middleware
     const userId = context.session.user.id;
@@ -44,12 +50,15 @@ export const userRouter = {
       message: "Account deleted successfully",
     };
   }),
+
+  // Update current user's profile (name and email) - subscribers only
   updateProfile: protectedProcedure
     .input(updateProfileInputSchema)
     .handler(async ({ context, input }) => {
       // Session is guaranteed to exist by protectedProcedure middleware
       const sessionUser = context.session.user;
 
+      // Only subscribers can update their profile
       if (sessionUser.role !== "subscriber") {
         throw new ORPCError("FORBIDDEN", {
           message: ERROR_MESSAGES.FORBIDDEN.UPDATE_PROFILE,
@@ -58,6 +67,7 @@ export const userRouter = {
 
       const updateInput: UpdateProfileInput = input;
 
+      // Check if email is being changed and ensure it's not already taken
       if (updateInput.email !== sessionUser.email) {
         const [existingUser] = await db
           .select({ id: user.id })
@@ -74,6 +84,7 @@ export const userRouter = {
         }
       }
 
+      // Update user profile with new name and email
       const [updatedUser] = await db
         .update(user)
         .set({
