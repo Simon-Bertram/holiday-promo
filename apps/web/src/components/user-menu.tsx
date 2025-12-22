@@ -50,7 +50,7 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button>
           {session?.user ? (
             session.user.name
           ) : (

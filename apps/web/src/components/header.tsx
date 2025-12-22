@@ -15,8 +15,8 @@ export default function Header() {
           <MobileMenu />
         </nav>
         <div className="hidden items-center gap-2 md:flex">
-          <ModeToggle />
           <UserMenu />
+          <ModeToggle />
         </div>
       </div>
     </header>

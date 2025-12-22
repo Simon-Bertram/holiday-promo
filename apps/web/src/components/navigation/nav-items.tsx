@@ -1,5 +1,4 @@
 "use client";
-import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
@@ -50,10 +49,9 @@ export default function NavItems({ className, onItemClick }: NavItemsProps) {
   if (!session?.user) {
     return (
       <div className={className}>
-        <Button asChild onClick={onItemClick} variant="outline">
-          <Link className="flex items-center gap-2" href="/login">
-            <User className="size-4" />
-            <span>Sign In</span>
+        <Button asChild onClick={onItemClick}>
+          <Link className="flex items-center gap-2" href="/signup">
+            <span>Sign Up</span>
           </Link>
         </Button>
       </div>
