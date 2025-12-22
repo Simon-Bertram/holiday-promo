@@ -61,7 +61,7 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="min-w-24" disabled={isPending}>
+        <Button className="min-w-12" disabled={isPending}>
           {buttonContent}
         </Button>
       </DropdownMenuTrigger>

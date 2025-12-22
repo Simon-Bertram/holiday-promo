@@ -50,11 +50,11 @@ export default function LoginError({
               <p className="font-mono text-muted-foreground text-xs">
                 {error.message}
               </p>
-              {error.digest && (
+              {error.digest ? (
                 <p className="mt-2 font-mono text-muted-foreground text-xs">
                   Error ID: {error.digest}
                 </p>
-              )}
+              ) : null}
             </div>
           )}
           <div className="flex gap-2">

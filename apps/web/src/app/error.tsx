@@ -39,11 +39,11 @@ export default function ErrorPage({
               <p className="font-mono text-muted-foreground text-sm">
                 {error.message}
               </p>
-              {error.digest && (
+              {error.digest ? (
                 <p className="mt-2 text-muted-foreground text-xs">
                   Error ID: {error.digest}
                 </p>
-              )}
+              ) : null}
             </div>
           )}
           <div className="flex gap-2">

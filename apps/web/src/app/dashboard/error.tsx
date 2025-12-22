@@ -29,7 +29,7 @@ export default function DashboardError({
             Dashboard Error
           </CardTitle>
           <CardDescription>
-            We couldn't load your dashboard. Please try again.
+            We couldn&apos;t load your dashboard. Please try again.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

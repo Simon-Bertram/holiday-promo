@@ -9,15 +9,15 @@ export default function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-20 bg-linear-to-t from-transparent to-white dark:to-black">
       <div className="container mx-auto flex min-h-16 flex-row items-center justify-between bg-transparent px-2 py-4">
-        <nav className="my-2 flex w-full items-center justify-between gap-4 bg-transparent align-middle font-black text-black text-xl drop-shadow dark:text-white">
+        <nav className="my-2 flex w-full items-center gap-4 bg-transparent align-middle font-black text-black text-xl drop-shadow dark:text-white">
           <Logo />
-          <NavItems className="mr-4 hidden items-center gap-4 md:flex" />
+          <NavItems className="hidden items-center gap-4 md:flex" />
           <MobileMenu />
+          <div className="ml-auto hidden min-w-14 items-center justify-end gap-4 md:flex">
+            <UserMenu />
+            <ModeToggle />
+          </div>
         </nav>
-        <div className="hidden min-w-32 items-center justify-end gap-2 md:flex">
-          <UserMenu />
-          <ModeToggle />
-        </div>
       </div>
     </header>
   );
