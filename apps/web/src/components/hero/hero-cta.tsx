@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import SubscriptionForm from "./subscription-form";
 
 export default function HeroCta() {
   return (
@@ -22,10 +23,17 @@ export default function HeroCta() {
           Get the best deals on flights, hotels, and more.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Button asChild>
-          <Link href="/signup">Sign up now</Link>
-        </Button>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div>
+            <SubscriptionForm />
+          </div>
+          <div>
+            <Button asChild className="shrink-0 self-end sm:self-start">
+              <Link href="/signup">Sign up now</Link>
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
