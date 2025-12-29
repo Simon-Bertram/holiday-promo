@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { Button } from "../ui/button";
 import {
   Card,
   CardContent,
@@ -24,15 +22,8 @@ export default function HeroCta() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-          <div>
-            <SubscriptionForm />
-          </div>
-          <div>
-            <Button asChild className="shrink-0 self-end sm:self-start">
-              <Link href="/signup">Sign up now</Link>
-            </Button>
-          </div>
+        <div>
+          <SubscriptionForm />
         </div>
       </CardContent>
     </Card>

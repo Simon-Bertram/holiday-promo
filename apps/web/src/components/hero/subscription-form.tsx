@@ -109,8 +109,8 @@ export default function SubscriptionForm({ onSuccess }: SubscriptionFormProps) {
         className="flex w-full flex-col gap-3"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
-        <Field className="flex flex-row gap-2">
-          <div className="flex-1">
+        <Field className="mb-6 flex flex-col gap-4">
+          <div>
             <Input
               aria-label="Email address"
               disabled={isSubmitting}
@@ -131,7 +131,7 @@ export default function SubscriptionForm({ onSuccess }: SubscriptionFormProps) {
           </Button>
         </Field>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <TurnstileWidget
             onError={handleTurnstileError}
             onSuccess={handleTurnstileSuccess}
