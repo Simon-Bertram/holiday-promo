@@ -37,7 +37,6 @@ export default function SignInForm() {
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
-      password: "",
       turnstileToken: "",
     },
   });
@@ -82,7 +81,8 @@ export default function SignInForm() {
             </Link>
             <h1 className="font-bold text-xl">Welcome to Acme Inc.</h1>
             <FieldDescription>
-              Don&apos;t have an account?{" "}
+              Enter your email and we&apos;ll send you a magic link to sign in.
+              No password needed!{" "}
               <Link className="underline" href="/signup">
                 Sign up
               </Link>
@@ -102,23 +102,6 @@ export default function SignInForm() {
                 errors={
                   form.formState.errors.email
                     ? [{ message: form.formState.errors.email.message }]
-                    : undefined
-                }
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                id="password"
-                placeholder="Enter your password"
-                required
-                type="password"
-                {...form.register("password")}
-              />
-              <FieldError
-                errors={
-                  form.formState.errors.password
-                    ? [{ message: form.formState.errors.password.message }]
                     : undefined
                 }
               />
@@ -146,7 +129,7 @@ export default function SignInForm() {
                 disabled={form.formState.isSubmitting}
                 type="submit"
               >
-                {form.formState.isSubmitting ? "loading" : "Login"}
+                {form.formState.isSubmitting ? "Sending..." : "Send Magic Link"}
               </Button>
             </Field>
             <FieldSeparator className="my-4">Or</FieldSeparator>

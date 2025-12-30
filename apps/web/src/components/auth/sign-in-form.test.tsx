@@ -55,9 +55,8 @@ vi.mock("@/lib/auth-client", () => ({
 }));
 
 // Regex patterns defined at top level for performance
-const LOGIN_BUTTON_REGEX = /login/i;
+const SEND_MAGIC_LINK_BUTTON_REGEX = /send magic link/i;
 const EMAIL_LABEL_REGEX = /email/i;
-const PASSWORD_LABEL_REGEX = /password/i;
 const VERIFICATION_REQUIRED_REGEX = /verification is required/i;
 
 describe("SignInForm - Turnstile Integration", () => {
@@ -83,7 +82,7 @@ describe("SignInForm - Turnstile Integration", () => {
     await waitFor(() => {
       // Form should be ready to submit with token
       const submitButton = screen.getByRole("button", {
-        name: LOGIN_BUTTON_REGEX,
+        name: SEND_MAGIC_LINK_BUTTON_REGEX,
       });
       expect(submitButton).toBeInTheDocument();
     });
@@ -98,14 +97,12 @@ describe("SignInForm - Turnstile Integration", () => {
 
     // Fill form fields
     const emailInput = screen.getByLabelText(EMAIL_LABEL_REGEX);
-    const passwordInput = screen.getByLabelText(PASSWORD_LABEL_REGEX);
 
     await user.type(emailInput, "test@example.com");
-    await user.type(passwordInput, "password123");
 
     // Submit form
     const submitButton = screen.getByRole("button", {
-      name: LOGIN_BUTTON_REGEX,
+      name: SEND_MAGIC_LINK_BUTTON_REGEX,
     });
     await user.click(submitButton);
 
@@ -121,14 +118,12 @@ describe("SignInForm - Turnstile Integration", () => {
 
     // Fill form fields without triggering Turnstile success
     const emailInput = screen.getByLabelText(EMAIL_LABEL_REGEX);
-    const passwordInput = screen.getByLabelText(PASSWORD_LABEL_REGEX);
 
     await user.type(emailInput, "test@example.com");
-    await user.type(passwordInput, "password123");
 
     // Try to submit without token
     const submitButton = screen.getByRole("button", {
-      name: LOGIN_BUTTON_REGEX,
+      name: SEND_MAGIC_LINK_BUTTON_REGEX,
     });
     await user.click(submitButton);
 
@@ -158,14 +153,12 @@ describe("SignInForm - Turnstile Integration", () => {
 
     // Fill form
     const emailInput = screen.getByLabelText(EMAIL_LABEL_REGEX);
-    const passwordInput = screen.getByLabelText(PASSWORD_LABEL_REGEX);
 
     await user.type(emailInput, "test@example.com");
-    await user.type(passwordInput, "password123");
 
     // Submit
     const submitButton = screen.getByRole("button", {
-      name: LOGIN_BUTTON_REGEX,
+      name: SEND_MAGIC_LINK_BUTTON_REGEX,
     });
     await user.click(submitButton);
 

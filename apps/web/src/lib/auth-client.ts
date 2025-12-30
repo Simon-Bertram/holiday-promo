@@ -1,5 +1,8 @@
 import type { auth } from "@holiday-promo/auth";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import {
+  inferAdditionalFields,
+  magicLinkClient,
+} from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 // Store for Turnstile token to be included in requests
@@ -29,7 +32,7 @@ const customFetch: typeof fetch = (input, init) => {
 };
 
 export const authClient = createAuthClient({
-  plugins: [inferAdditionalFields<typeof auth>()],
+  plugins: [inferAdditionalFields<typeof auth>(), magicLinkClient()],
   baseURL: process.env.NEXT_PUBLIC_BASE_URL || "",
   fetch: customFetch,
 });

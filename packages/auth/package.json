@@ -24,6 +24,7 @@
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:",
+    "resend": "^4.0.0",
     "@holiday-promo/db": "workspace:*"
   }
 }

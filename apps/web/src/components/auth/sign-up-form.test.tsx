@@ -75,7 +75,9 @@ describe("SignUpForm - Turnstile Integration", () => {
     // Token should be captured and stored in form state
     await waitFor(() => {
       // Form should be ready to submit with token
-      const submitButton = screen.getByRole("button", { name: /sign up/i });
+      const submitButton = screen.getByRole("button", {
+        name: /send magic link/i,
+      });
       expect(submitButton).toBeInTheDocument();
     });
   });
@@ -90,14 +92,14 @@ describe("SignUpForm - Turnstile Integration", () => {
     // Fill form fields
     const nameInput = screen.getByLabelText(/name/i);
     const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
 
     await user.type(nameInput, "Test User");
     await user.type(emailInput, "test@example.com");
-    await user.type(passwordInput, "password123");
 
     // Submit form
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
+    const submitButton = screen.getByRole("button", {
+      name: /send magic link/i,
+    });
     await user.click(submitButton);
 
     // Form should submit with token
@@ -120,7 +122,9 @@ describe("SignUpForm - Turnstile Integration", () => {
     await user.type(passwordInput, "password123");
 
     // Try to submit without token
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
+    const submitButton = screen.getByRole("button", {
+      name: /send magic link/i,
+    });
     await user.click(submitButton);
 
     // Form should show validation error or prevent submission
@@ -145,7 +149,9 @@ describe("SignUpForm - Turnstile Integration", () => {
     await user.type(passwordInput, "password123");
 
     // Submit should fail validation
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
+    const submitButton = screen.getByRole("button", {
+      name: /send magic link/i,
+    });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -180,7 +186,9 @@ describe("SignUpForm - Turnstile Integration", () => {
     await user.type(passwordInput, "password123");
 
     // Submit
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
+    const submitButton = screen.getByRole("button", {
+      name: /send magic link/i,
+    });
     await user.click(submitButton);
 
     await waitFor(() => {

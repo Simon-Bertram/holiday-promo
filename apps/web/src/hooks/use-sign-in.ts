@@ -10,7 +10,7 @@ export type UseSignInResult = {
 };
 
 /**
- * Custom hook for handling sign-in logic
+ * Custom hook for handling sign-in logic with magic link
  * Follows Next.js best practices for error handling:
  * - Handles expected errors explicitly
  * - Provides user-friendly error messages
@@ -24,15 +24,14 @@ export function useSignIn(): UseSignInResult {
       // Set Turnstile token for the next auth request
       setTurnstileToken(data.turnstileToken);
 
-      await authClient.signIn.email(
+      await authClient.signIn.magicLink(
         {
           email: data.email,
-          password: data.password,
+          callbackURL: "/dashboard",
         },
         {
           onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign in successful");
+            toast.success("Magic link sent! Check your email.");
           },
           onError: (error) => {
             handleAuthError(error, data.email);

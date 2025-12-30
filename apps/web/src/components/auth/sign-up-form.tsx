@@ -38,7 +38,6 @@ export default function SignUpForm() {
     defaultValues: {
       name: "",
       email: "",
-      password: "",
       turnstileToken: "",
     },
   });
@@ -85,7 +84,8 @@ export default function SignUpForm() {
               Create an account for the best holiday deals
             </h1>
             <FieldDescription>
-              Already have an account?{" "}
+              Enter your details and we&apos;ll send you a magic link to sign
+              up. No password needed!{" "}
               <Link className="underline" href="/login">
                 Sign in
               </Link>
@@ -120,23 +120,6 @@ export default function SignUpForm() {
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                id="password"
-                placeholder="Enter your password"
-                required
-                type="password"
-                {...form.register("password")}
-              />
-              <FieldError
-                errors={
-                  form.formState.errors.password
-                    ? [{ message: form.formState.errors.password.message }]
-                    : undefined
-                }
-              />
-            </Field>
-            <Field>
               <TurnstileWidget
                 onError={handleTurnstileError}
                 onSuccess={handleTurnstileSuccess}
@@ -159,7 +142,7 @@ export default function SignUpForm() {
                 disabled={form.formState.isSubmitting}
                 type="submit"
               >
-                {form.formState.isSubmitting ? "loading" : "Sign Up"}
+                {form.formState.isSubmitting ? "Sending..." : "Send Magic Link"}
               </Button>
             </Field>
             <FieldSeparator className="my-4">Or</FieldSeparator>

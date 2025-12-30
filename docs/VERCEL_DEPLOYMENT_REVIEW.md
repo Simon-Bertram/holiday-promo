@@ -30,6 +30,12 @@ The following environment variables **MUST** be configured in Vercel before depl
 - `META_CLIENT_ID` - Facebook OAuth client ID (if using Facebook login)
 - `META_CLIENT_SECRET` - Facebook OAuth client secret (if using Facebook login)
 
+#### Magic Link Email (Resend)
+
+- `RESEND_API_KEY` - Resend API key for sending magic link emails (required for production)
+- `RESEND_FROM_EMAIL` - Verified sender email address (e.g., `noreply@yourdomain.com`) (required for production)
+- **Note:** In development, magic links are logged to console instead of being sent via email
+
 #### Cloudflare Turnstile
 
 - `TURNSTILE_SECRET_KEY` - Server-side secret key (required for sign-in/sign-up)
@@ -172,6 +178,8 @@ Add all required environment variables in Vercel Dashboard:
 - [ ] `GOOGLE_CLIENT_SECRET` (if using)
 - [ ] `META_CLIENT_ID` (if using)
 - [ ] `META_CLIENT_SECRET` (if using)
+- [ ] `RESEND_API_KEY` (required for magic link emails)
+- [ ] `RESEND_FROM_EMAIL` (required for magic link emails)
 - [ ] `FACEBOOK_APP_SECRET` (if using)
 - [ ] `FACEBOOK_DELETION_STATUS_URL` (if using)
 

@@ -1,26 +1,23 @@
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient, setTurnstileToken } from "@/lib/auth-client";
 import type { SignUpFormData } from "@/lib/validations/auth";
 
 export function useSignUp() {
-  const router = useRouter();
-
   const signUp = async (data: SignUpFormData) => {
     try {
       // Set Turnstile token for the next auth request
       setTurnstileToken(data.turnstileToken);
 
-      await authClient.signUp.email(
+      await authClient.signIn.magicLink(
         {
-          name: data.name,
           email: data.email,
-          password: data.password,
+          name: data.name,
+          callbackURL: "/dashboard",
+          newUserCallbackURL: "/dashboard",
         },
         {
           onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign up successful");
+            toast.success("Magic link sent! Check your email.");
           },
           onError: (error) => {
             const errorMessage =

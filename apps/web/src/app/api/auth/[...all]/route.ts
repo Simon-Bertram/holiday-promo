@@ -21,12 +21,13 @@ async function validateTurnstileIfNeeded(
   const url = new URL(req.url);
   const pathname = url.pathname;
 
-  // Only validate for sign-in and sign-up endpoints
-  // Better Auth uses /api/auth/sign-in and /api/auth/sign-up
-  const isSignIn = pathname.endsWith("/sign-in");
+  // Only validate for magic link sign-in and sign-up endpoints
+  // Better Auth uses /api/auth/sign-in-magic-link for magic link
+  // and /api/auth/sign-up for sign-up (magic link handles both)
+  const isMagicLinkSignIn = pathname.endsWith("/sign-in-magic-link");
   const isSignUp = pathname.endsWith("/sign-up");
 
-  if (!(isSignIn || isSignUp)) {
+  if (!(isMagicLinkSignIn || isSignUp)) {
     return null;
   }
 
