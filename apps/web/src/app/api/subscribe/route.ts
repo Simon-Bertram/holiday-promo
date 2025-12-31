@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: {
-            message: validation.error.errors[0]?.message || "Invalid request",
+            message: validation.error.issues[0]?.message || "Invalid request",
             statusText: "Bad Request",
           },
         },
