@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +19,21 @@ import { AUTH_CONFIG } from "@/lib/constants/auth";
  *
  * This component handles the UI presentation only.
  * Business logic is delegated to the useVerifyMagicLink hook.
+ * Wrapped in Suspense boundary to satisfy Next.js requirements for useSearchParams().
  */
 export default function VerifyMagicLinkPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <VerifyMagicLinkContent />
+    </Suspense>
+  );
+}
+
+/**
+ * Content component that uses useSearchParams() via useVerifyMagicLink hook
+ * Must be wrapped in Suspense boundary per Next.js requirements
+ */
+function VerifyMagicLinkContent() {
   const { status, errorMessage, retry } = useVerifyMagicLink();
 
   if (status === "loading") {
