@@ -7,25 +7,32 @@ import { and, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { createApiErrorResponse } from "@/utils/error-response";
 
-type FacebookSignedRequestPayload = {
+interface FacebookSignedRequestPayload {
   algorithm?: string;
   issued_at?: number;
   user_id?: string;
   user?: {
     id?: string;
   };
-};
+}
 
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 const DELETION_STATUS_URL = process.env.FACEBOOK_DELETION_STATUS_URL;
 const FACEBOOK_PROVIDER_ID = "facebook";
 
+/**
+ * Normalizes Facebook's URL-safe base64 encoding to standard base64
+ * (replaces - with + and _ with /, then adds padding)
+ */
 function normalizeBase64(value: string) {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
   const padding = normalized.length % 4 === 0 ? 0 : 4 - (normalized.length % 4);
   return normalized.padEnd(normalized.length + padding, "=");
 }
 
+/**
+ * Decodes the base64-encoded payload from Facebook's signed_request
+ */
 function decodePayload(encodedPayload: string): FacebookSignedRequestPayload {
   const payloadJson = Buffer.from(
     normalizeBase64(encodedPayload),
@@ -34,17 +41,23 @@ function decodePayload(encodedPayload: string): FacebookSignedRequestPayload {
   return JSON.parse(payloadJson) as FacebookSignedRequestPayload;
 }
 
+/**
+ * Verifies Facebook's signed_request using HMAC-SHA256 signature validation
+ * Returns the decoded payload if verification succeeds
+ */
 function verifySignedRequest(signedRequest: string) {
   if (!FACEBOOK_APP_SECRET) {
     throw new Error("FACEBOOK_APP_SECRET is not configured");
   }
 
+  // Facebook signed_request format: signature.payload
   const [encodedSignature, encodedPayload] = signedRequest.split(".");
 
   if (!(encodedSignature && encodedPayload)) {
     throw new Error("Invalid Facebook signed_request");
   }
 
+  // Compute expected signature using app secret
   const expectedSignature = crypto
     .createHmac("sha256", FACEBOOK_APP_SECRET)
     .update(encodedPayload)
@@ -55,6 +68,7 @@ function verifySignedRequest(signedRequest: string) {
     "base64"
   );
 
+  // Use timing-safe comparison to prevent timing attacks
   if (
     providedSignature.length !== expectedSignature.length ||
     !crypto.timingSafeEqual(providedSignature, expectedSignature)
@@ -71,6 +85,10 @@ function verifySignedRequest(signedRequest: string) {
   return payload;
 }
 
+/**
+ * Extracts the signed_request from the request body
+ * Supports both JSON and form-encoded content types
+ */
 async function extractSignedRequest(req: NextRequest) {
   const contentType = req.headers.get("content-type") || "";
 
@@ -93,6 +111,10 @@ async function extractSignedRequest(req: NextRequest) {
   return null;
 }
 
+/**
+ * Builds the status URL for Facebook to check deletion status
+ * Includes confirmation code and user ID as query parameters
+ */
 function buildStatusUrl(params: { confirmationCode: string; userId: string }) {
   if (!DELETION_STATUS_URL) {
     throw new Error("FACEBOOK_DELETION_STATUS_URL is not configured");
@@ -104,6 +126,11 @@ function buildStatusUrl(params: { confirmationCode: string; userId: string }) {
   return base.toString();
 }
 
+/**
+ * Facebook Data Deletion Callback endpoint
+ * Handles user data deletion requests from Facebook per their policy requirements
+ * Verifies the signed_request, deletes the user if found, and returns a status URL
+ */
 export async function POST(req: NextRequest) {
   try {
     const signedRequest = await extractSignedRequest(req);
@@ -114,6 +141,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Verify the signed_request authenticity and extract payload
     const payload = verifySignedRequest(signedRequest);
     const facebookUserId = payload.user_id || payload.user?.id;
 
@@ -123,6 +151,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Find the user account linked to this Facebook account
     const [accountRecord] = await db
       .select({ userId: account.userId })
       .from(account)
@@ -134,10 +163,12 @@ export async function POST(req: NextRequest) {
       )
       .limit(1);
 
+    // Delete user data if account exists
     if (accountRecord) {
       await deleteUserById(accountRecord.userId);
     }
 
+    // Generate confirmation code and status URL for Facebook
     const confirmationCode = crypto.randomUUID();
     const statusUrl = buildStatusUrl({
       confirmationCode,
