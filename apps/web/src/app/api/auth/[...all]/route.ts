@@ -1,8 +1,8 @@
 import { auth } from "@holiday-promo/auth";
 import { toNextJsHandler } from "better-auth/next-js";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 import { getClientIp, verifyTurnstileToken } from "@/lib/turnstile";
+import { createApiErrorResponse } from "@/utils/error-response";
 
 const authHandler = toNextJsHandler(auth.handler);
 
@@ -35,15 +35,9 @@ async function validateTurnstileIfNeeded(
   const turnstileToken = req.headers.get("x-turnstile-token");
 
   if (!turnstileToken) {
-    return NextResponse.json(
-      {
-        error: {
-          message: "Turnstile verification is required",
-          statusText: "Bad Request",
-        },
-      },
-      { status: 400 }
-    );
+    return createApiErrorResponse("Turnstile verification is required", 400, {
+      statusText: "Bad Request",
+    });
   }
 
   // Get client IP for validation
@@ -53,14 +47,10 @@ async function validateTurnstileIfNeeded(
   const validation = await verifyTurnstileToken(turnstileToken, clientIp);
 
   if (!validation.success) {
-    return NextResponse.json(
-      {
-        error: {
-          message: validation.error || "Turnstile verification failed",
-          statusText: "Bad Request",
-        },
-      },
-      { status: 400 }
+    return createApiErrorResponse(
+      validation.error || "Turnstile verification failed",
+      400,
+      { statusText: "Bad Request" }
     );
   }
 

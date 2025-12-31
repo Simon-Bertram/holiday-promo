@@ -5,6 +5,7 @@ import { db } from "@holiday-promo/db";
 import { account } from "@holiday-promo/db/schema/auth";
 import { and, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
+import { createApiErrorResponse } from "@/utils/error-response";
 
 type FacebookSignedRequestPayload = {
   algorithm?: string;
@@ -108,20 +109,18 @@ export async function POST(req: NextRequest) {
     const signedRequest = await extractSignedRequest(req);
 
     if (!signedRequest) {
-      return NextResponse.json(
-        { error: "signed_request missing" },
-        { status: 400 }
-      );
+      return createApiErrorResponse("signed_request missing", 400, {
+        statusText: "Bad Request",
+      });
     }
 
     const payload = verifySignedRequest(signedRequest);
     const facebookUserId = payload.user_id || payload.user?.id;
 
     if (!facebookUserId) {
-      return NextResponse.json(
-        { error: "user_id missing in signed_request" },
-        { status: 400 }
-      );
+      return createApiErrorResponse("user_id missing in signed_request", 400, {
+        statusText: "Bad Request",
+      });
     }
 
     const [accountRecord] = await db
@@ -148,9 +147,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: statusUrl });
   } catch (error) {
     console.error("Facebook data deletion error", error);
-    return NextResponse.json(
-      { error: "Unable to process data deletion request" },
-      { status: 500 }
+    return createApiErrorResponse(
+      "Unable to process data deletion request",
+      500,
+      {
+        error,
+        statusText: "Internal Server Error",
+      }
     );
   }
 }

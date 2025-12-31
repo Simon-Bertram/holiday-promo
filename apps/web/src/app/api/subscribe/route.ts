@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getClientIp, verifyTurnstileToken } from "@/lib/turnstile";
 import { subscriptionSchema } from "@/lib/validations/subscription";
+import { createApiErrorResponse } from "@/utils/error-response";
 
 /**
  * POST /api/subscribe
@@ -17,14 +18,10 @@ export async function POST(req: NextRequest) {
     // Validate request body
     const validation = subscriptionSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: {
-            message: validation.error.issues[0]?.message || "Invalid request",
-            statusText: "Bad Request",
-          },
-        },
-        { status: 400 }
+      return createApiErrorResponse(
+        validation.error.issues[0]?.message || "Invalid request",
+        400,
+        { statusText: "Bad Request" }
       );
     }
 
@@ -40,15 +37,10 @@ export async function POST(req: NextRequest) {
     );
 
     if (!turnstileValidation.success) {
-      return NextResponse.json(
-        {
-          error: {
-            message:
-              turnstileValidation.error || "Turnstile verification failed",
-            statusText: "Bad Request",
-          },
-        },
-        { status: 400 }
+      return createApiErrorResponse(
+        turnstileValidation.error || "Turnstile verification failed",
+        400,
+        { statusText: "Bad Request" }
       );
     }
 
@@ -90,14 +82,9 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     console.error("Subscription error:", error);
-    return NextResponse.json(
-      {
-        error: {
-          message: "Failed to process subscription",
-          statusText: "Internal Server Error",
-        },
-      },
-      { status: 500 }
-    );
+    return createApiErrorResponse("Failed to process subscription", 500, {
+      error,
+      statusText: "Internal Server Error",
+    });
   }
 }

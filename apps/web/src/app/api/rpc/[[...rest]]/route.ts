@@ -14,7 +14,7 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
 import { createErrorLogger } from "@/utils/error-logger";
-import { createErrorResponse } from "@/utils/error-response";
+import { createApiErrorResponse } from "@/utils/error-response";
 import { getNextRequestInfo } from "@/utils/request-info";
 
 /**
@@ -93,7 +93,10 @@ async function handleRequest(req: NextRequest) {
       userAgent: requestInfo.userAgent,
       ipAddress: requestInfo.ipAddress,
     });
-    return createErrorResponse(error);
+    return createApiErrorResponse("Internal server error", 500, {
+      error,
+      statusText: "Internal Server Error",
+    });
   }
 }
 
