@@ -16,7 +16,9 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsdown"
+    "build": "tsdown",
+    "generate:openapi": "bun run scripts/generate-openapi.ts > openapi.json",
+    "generate:openapi:console": "bun run scripts/generate-openapi.ts"
   },
   "peerDependencies": {
     "drizzle-orm": "^0.44.7",
