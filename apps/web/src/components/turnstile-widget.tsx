@@ -42,14 +42,22 @@ export default function TurnstileWidget({
 
   // Development fallback: Use Cloudflare's test key if no sitekey is configured
   // This allows the app to work in development without requiring env setup
-  // Source: https://developers.cloudflare.com/turnstile/get-started/testing/
+  // Test sitekey: 1x00000000000000000000AA (always passes, visible widget)
+  // Must be paired with test secret key: 1x0000000000000000000000000000000AA
+  // Source: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
   if (!siteKey && process.env.NODE_ENV !== "production") {
     siteKey = "1x00000000000000000000AA";
-    if (typeof window !== "undefined") {
-      console.warn(
-        "[Turnstile] No NEXT_PUBLIC_TURNSTILE_SITEKEY found. Using Cloudflare test key. " +
-          "Set NEXT_PUBLIC_TURNSTILE_SITEKEY in your .env.local file for production."
+    // Only log once per session to avoid console spam
+    if (
+      typeof window !== "undefined" &&
+      !(window as Window & { __turnstileWarned?: boolean }).__turnstileWarned
+    ) {
+      console.debug(
+        "[Turnstile] Using Cloudflare test key for development. " +
+          "Set NEXT_PUBLIC_TURNSTILE_SITEKEY in your .env.local file to use your own key."
       );
+      (window as Window & { __turnstileWarned?: boolean }).__turnstileWarned =
+        true;
     }
   }
 
