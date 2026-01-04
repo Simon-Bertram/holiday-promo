@@ -49,18 +49,13 @@
                 "type": "object",
                 "properties": {
                   "status": {
-                    "enum": [
-                      "connected",
-                      "disconnected"
-                    ]
+                    "enum": ["connected", "disconnected"]
                   },
                   "error": {
                     "type": "string"
                   }
                 },
-                "required": [
-                  "status"
-                ]
+                "required": ["status"]
               }
             }
           }
@@ -192,10 +187,7 @@
                     "format": "email"
                   }
                 },
-                "required": [
-                  "name",
-                  "email"
-                ]
+                "required": ["name", "email"]
               }
             }
           }

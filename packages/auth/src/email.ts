@@ -8,48 +8,47 @@ const isDevelopment = process.env.NODE_ENV === "development";
  * In production: sends via Resend API
  */
 export async function sendMagicLinkEmail({
-	email,
-	token,
-	url,
+  email,
+  token,
+  url,
 }: {
-	email: string;
-	token: string;
-	url: string;
+  email: string;
+  token: string;
+  url: string;
 }): Promise<void> {
-	if (isDevelopment) {
-		// Development: Log to console for easy testing
-		console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-		console.log("📧 MAGIC LINK EMAIL (Development Mode)");
-		console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-		console.log(`To: ${email}`);
-		console.log(`Token: ${token}`);
-		console.log(`URL: ${url}`);
-		console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-		return;
-	}
+  if (isDevelopment) {
+    // Development: Log to console for easy testing
+    console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("📧 MAGIC LINK EMAIL (Development Mode)");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log(`To: ${email}`);
+    console.log(`Token: ${token}`);
+    console.log(`URL: ${url}`);
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    return;
+  }
 
-	// Production: Send via Resend
-	const resendApiKey = process.env.RESEND_API_KEY;
-	const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@example.com";
+  // Production: Send via Resend
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@example.com";
 
-	if (!resendApiKey) {
-		console.error(
-			"RESEND_API_KEY is not set. Cannot send magic link email."
-		);
-		throw new Error("Email service not configured");
-	}
+  if (!resendApiKey) {
+    console.error("RESEND_API_KEY is not set. Cannot send magic link email.");
+    throw new Error("Email service not configured");
+  }
 
-	const resend = new Resend(resendApiKey);
+  const resend = new Resend(resendApiKey);
 
-	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.CORS_ORIGIN || "";
-	const appName = "Acme Inc.";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || process.env.CORS_ORIGIN || "";
+  const appName = "Acme Inc.";
 
-	try {
-		await resend.emails.send({
-			from: fromEmail,
-			to: email,
-			subject: `Sign in to ${appName}`,
-			html: `
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      to: email,
+      subject: `Sign in to ${appName}`,
+      html: `
 				<!DOCTYPE html>
 				<html>
 					<head>
@@ -83,7 +82,7 @@ export async function sendMagicLinkEmail({
 					</body>
 				</html>
 			`,
-			text: `
+      text: `
 Sign in to ${appName}
 
 Click the link below to sign in to your account. This link will expire in 5 minutes.
@@ -92,10 +91,9 @@ ${url}
 
 If you didn't request this email, you can safely ignore it.
 			`.trim(),
-		});
-	} catch (error) {
-		console.error("Failed to send magic link email:", error);
-		throw new Error("Failed to send magic link email");
-	}
+    });
+  } catch (error) {
+    console.error("Failed to send magic link email:", error);
+    throw new Error("Failed to send magic link email");
+  }
 }
-

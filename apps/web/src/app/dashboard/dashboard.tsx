@@ -1,85 +1,107 @@
 "use client";
-import type { auth } from "@holiday-promo/auth";
-import type { user as userTable } from "@holiday-promo/db/schema/auth";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import {
+  type ColumnFiltersState,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useCallback, useMemo, useState } from "react";
 import { orpc } from "@/utils/orpc";
+import { userColumns } from "./columns";
+import { AccountInfo } from "./components/account-info";
+import { ErrorState } from "./components/error-state";
+import { LoadingState } from "./components/loading-state";
+import { TableFilters } from "./components/table-filters";
+import { TablePagination } from "./components/table-pagination";
+import { UsersTable } from "./components/users-table";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT_COLUMN,
+  DEFAULT_SORT_DIRECTION,
+} from "./constants";
+import type { SessionWithRole } from "./types";
 
-type AuthSession = Awaited<ReturnType<typeof auth.api.getSession>>;
-type NonNullAuthSession = Exclude<AuthSession, null>;
-type SessionWithRole = NonNullAuthSession & {
-  user: NonNullAuthSession["user"] & {
-    role: (typeof userTable.$inferSelect)["role"];
-  };
-};
-
+/**
+ * Dashboard component that displays user account information and a list of all users.
+ * Shows the current user's session details and a sortable, filterable, paginated table of registered users.
+ */
 export default function Dashboard({ session }: { session: SessionWithRole }) {
   const usersQuery = useQuery(orpc.user.list.queryOptions());
 
-  const sortedUsers = useMemo(
-    () =>
-      usersQuery.data
-        ?.slice()
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ) ?? [],
-    [usersQuery.data]
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: DEFAULT_SORT_COLUMN,
+      desc: DEFAULT_SORT_DIRECTION,
+    },
+  ]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const handleSortingChange = useCallback((updater: unknown) => {
+    setSorting((prev) => {
+      const newValue = typeof updater === "function" ? updater(prev) : updater;
+      return newValue as SortingState;
+    });
+  }, []);
+
+  const handleColumnFiltersChange = useCallback((updater: unknown) => {
+    setColumnFilters((prev) => {
+      const newValue = typeof updater === "function" ? updater(prev) : updater;
+      return newValue as ColumnFiltersState;
+    });
+  }, []);
+
+  const tableOptions = useMemo(
+    () => ({
+      data: usersQuery.data ?? [],
+      columns: userColumns,
+      getCoreRowModel: getCoreRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      onSortingChange: handleSortingChange,
+      onColumnFiltersChange: handleColumnFiltersChange,
+      state: {
+        sorting,
+        columnFilters,
+      },
+      initialState: {
+        pagination: {
+          pageSize: DEFAULT_PAGE_SIZE,
+        },
+      },
+    }),
+    [
+      usersQuery.data,
+      sorting,
+      columnFilters,
+      handleSortingChange,
+      handleColumnFiltersChange,
+    ]
   );
 
+  // React Compiler: TanStack Table's useReactTable returns functions that cannot be memoized.
+  // This is expected behavior - React Compiler will skip memoization for this call.
+  // The table instance is safe to use as long as child components are not memoized.
+  const table = useReactTable(tableOptions);
+
   if (usersQuery.isLoading) {
-    return <p>Loading users...</p>;
+    return <LoadingState />;
   }
 
   if (usersQuery.isError) {
-    return (
-      <div className="rounded-md bg-destructive/10 p-4 text-destructive">
-        Failed to load users.
-      </div>
-    );
+    return <ErrorState />;
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="font-semibold text-xl">Account</h2>
-        <p className="text-muted-foreground">
-          Logged in as {session.user.email} ({session.user.role})
-        </p>
-      </div>
-
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full min-w-[600px] border-collapse text-left">
-          <thead className="bg-muted">
-            <tr>
-              <th className="px-4 py-3 font-medium text-sm uppercase tracking-wide">
-                Name
-              </th>
-              <th className="px-4 py-3 font-medium text-sm uppercase tracking-wide">
-                Email
-              </th>
-              <th className="px-4 py-3 font-medium text-sm uppercase tracking-wide">
-                Role
-              </th>
-              <th className="px-4 py-3 font-medium text-sm uppercase tracking-wide">
-                Joined
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedUsers.map((user) => (
-              <tr className="border-border border-t" key={user.id}>
-                <td className="px-4 py-3 font-medium text-sm">{user.name}</td>
-                <td className="px-4 py-3 text-sm">{user.email}</td>
-                <td className="px-4 py-3 text-sm capitalize">{user.role}</td>
-                <td className="px-4 py-3 text-sm">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AccountInfo session={session} />
+      <TableFilters table={table} />
+      <UsersTable table={table} />
+      <TablePagination table={table} />
     </div>
   );
 }
