@@ -17,7 +17,18 @@ export const auth = betterAuth<BetterAuthOptions>({
 
     schema: { user, session, account, verification },
   }),
-  trustedOrigins: [process.env.CORS_ORIGIN || ""],
+  // CSRF Protection: Validate Origin header against trusted origins
+  // Fail closed in production (empty array rejects all if not configured)
+  // Development fallback allows localhost for local testing
+  trustedOrigins: (() => {
+    if (process.env.CORS_ORIGIN) {
+      return [process.env.CORS_ORIGIN];
+    }
+    if (process.env.NODE_ENV === "production") {
+      return []; // Fail closed in production - reject all if CORS_ORIGIN not set
+    }
+    return ["http://localhost:3000"]; // Development fallback
+  })(),
   user: {
     additionalFields: {
       role: {
